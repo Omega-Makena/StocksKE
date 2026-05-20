@@ -1,0 +1,41 @@
+# ── Secrets ───────────────────────────────────────────────
+.env
+
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# ── Test / lint cache ─────────────────────────────────────
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# ── Runtime outputs (importer & pipeline) ─────────────────
+downloaded_price_lists/
+compiled_securities/
+prices.csv
+nse_dataset/
+
+# ── Data files ────────────────────────────────────────────
+*.xls
+*.db
+
+# ── IDE ───────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+
+# ── OS ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── ML model artefacts ────────────────────────────────────
+*.pkl
+*.joblib
+models/
