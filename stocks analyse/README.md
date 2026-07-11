@@ -190,6 +190,26 @@ reports magnitude MAE and a confidence-calibration curve.
 > achievable without an intraday feed. Corporate-action handling is a heuristic
 > jump-filter, not a true adjusted-close.
 
+### 5a-ii — Forward accumulation (getting a real-sized backtest)
+
+A single scored run is meaningless: RSS carries only the last few days of news,
+whose prediction horizons fall in the *future* and can't be scored yet. The
+honest way to build a statistically meaningful backtest is to **run daily** —
+each day adds a few predictions, and each day more *old* predictions have their
+horizons realise and become scoreable.
+
+```bash
+cd pipeline
+python forward.py            # refresh prices · collect+extract NEW news · re-score everything
+python forward.py --score-only   # just re-score accumulated predictions
+```
+
+`forward.py` reports the growing sample, e.g. `Accumulated N predictions ->
+scoreable per horizon {1: 11, 3: 6}`. Schedule it daily (Windows Task Scheduler
+or cron); over a few weeks the scoreable sample grows into the hundreds and the
+harness scorecard becomes trustworthy. Cross-run dedup ensures only unseen
+articles hit the LLM, so the cost stays incremental.
+
 ### 5b — Calibrate the propagation engine
 
 Two levels of calibration, both persisted to `calibration.json` (auto-loaded by
