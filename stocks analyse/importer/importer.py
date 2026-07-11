@@ -19,6 +19,7 @@ Typical workflow:
 import argparse
 import csv
 import logging
+import os
 import re
 import time
 from collections import defaultdict
@@ -30,12 +31,36 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://www.innova.co.ke/files/Price%20List%20-"
+# Source URL + filename date format. Both are env-overridable so that when the
+# Innova endpoint changes you fix it with a flag/var, not a code edit:
+#   IMPORTER_BASE_URL     e.g. https://host/path/Price%20List%20-
+#   IMPORTER_DATE_FORMAT  strftime for the date portion (default "%d-%B-%Y")
+#   IMPORTER_FILE_EXT     ".xls" (default) or ".xlsx"
+#
+# NOTE: the live path includes a per-site GUID folder that may rotate. The value
+# below was verified working (returns real .xls). If it starts 404-ing, find the
+# current URL from the price-list page's Network tab and confirm with:
+#   python importer/importer.py probe --date <a-trading-day>
+BASE_URL = os.environ.get(
+    "IMPORTER_BASE_URL",
+    "https://www.innova.co.ke/DBECCB7F-3FDA-4FA1-B075-9BD11288CFF9/Price%20List%20-",
+)
+DATE_FORMAT = os.environ.get("IMPORTER_DATE_FORMAT", "%d-%B-%Y")
+FILE_EXT = os.environ.get("IMPORTER_FILE_EXT", ".xls")
 DEFAULT_DOWNLOAD_DIR = "downloaded_price_lists"
 DEFAULT_COMPILED_DIR = "compiled_securities"
 REQUEST_TIMEOUT = 20
 MAX_RETRIES = 3
 RETRY_BACKOFF_BASE = 2.0
+
+# Magic bytes: OLE2 (legacy .xls) and ZIP (.xlsx / OOXML).
+_XLS_MAGIC = b"\xd0\xcf\x11\xe0"
+_XLSX_MAGIC = b"PK\x03\x04"
+
+
+def _is_spreadsheet(content: bytes) -> bool:
+    """True if the bytes look like a real .xls/.xlsx file (not an HTML error page)."""
+    return content[:4] == _XLS_MAGIC or content[:4] == _XLSX_MAGIC
 
 
 # ---------------------------------------------------------------------------
@@ -43,13 +68,21 @@ RETRY_BACKOFF_BASE = 2.0
 # ---------------------------------------------------------------------------
 
 def _download_one(session: requests.Session, url: str, dest: Path) -> bool:
-    """Download a single URL to dest. Returns True on success."""
+    """Download a single URL to dest. Returns True only if the response is a
+    genuine spreadsheet — a 200 that is actually an HTML error page (as the
+    current Innova site returns) is rejected instead of silently saved."""
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.get(url, timeout=REQUEST_TIMEOUT)
             if resp.status_code == 200:
-                dest.write_bytes(resp.content)
-                return True
+                if _is_spreadsheet(resp.content):
+                    dest.write_bytes(resp.content)
+                    return True
+                ct = resp.headers.get("Content-Type", "?")
+                logger.warning(
+                    "200 but NOT a spreadsheet (Content-Type=%s, %d bytes) — likely an "
+                    "error page, not saving: %s", ct, len(resp.content), url)
+                return False
             if resp.status_code == 404:
                 logger.debug("Not found (404): %s", url)
                 return False
@@ -61,11 +94,41 @@ def _download_one(session: requests.Session, url: str, dest: Path) -> bool:
     return False
 
 
+def build_url(date: datetime, base_url: str = BASE_URL,
+              date_format: str = DATE_FORMAT, ext: str = FILE_EXT) -> str:
+    """Construct the price-list URL for a date (single place, so probe and
+    download always agree)."""
+    return f"{base_url}{date.strftime(date_format)}{ext}"
+
+
+def probe_url(date: datetime, base_url: str = BASE_URL,
+              date_format: str = DATE_FORMAT, ext: str = FILE_EXT) -> dict:
+    """Fetch one date's URL and report exactly what came back — use this from
+    inside the Innova network to discover/confirm the real working URL."""
+    url = build_url(date, base_url, date_format, ext)
+    info = {"url": url}
+    try:
+        with requests.Session() as s:
+            s.headers.update({"User-Agent": "NSE-Research-Bot/1.0"})
+            r = s.get(url, timeout=REQUEST_TIMEOUT)
+        info.update({
+            "status": r.status_code,
+            "content_type": r.headers.get("Content-Type", "?"),
+            "bytes": len(r.content),
+            "is_spreadsheet": _is_spreadsheet(r.content),
+        })
+    except requests.RequestException as exc:
+        info["error"] = f"{type(exc).__name__}: {exc}"
+    return info
+
+
 def download_price_lists(
     start_date: datetime,
     end_date: datetime,
     output_folder: str = DEFAULT_DOWNLOAD_DIR,
     base_url: str = BASE_URL,
+    date_format: str = DATE_FORMAT,
+    ext: str = FILE_EXT,
 ) -> list[Path]:
     """
     Download XLS price lists for every calendar day in [start_date, end_date].
@@ -81,9 +144,9 @@ def download_price_lists(
     with requests.Session() as session:
         session.headers.update({"User-Agent": "NSE-Research-Bot/1.0"})
         for date in dates:
-            formatted = date.strftime("%d-%B-%Y")
-            url = f"{base_url}{formatted}.xls"
-            dest = out / f"{formatted}.xls"
+            formatted = date.strftime(date_format)
+            url = build_url(date, base_url, date_format, ext)
+            dest = out / f"{formatted}{ext}"
             if dest.exists():
                 logger.info("Already exists, skipping: %s", dest.name)
                 saved.append(dest)
@@ -103,42 +166,50 @@ def download_price_lists(
 # Compile
 # ---------------------------------------------------------------------------
 
+# Column positions in the current Innova "Price-List" sheet (read with
+# header=None, so these are raw column indices). Layout as of 2024:
+#   0,1 = 52wk High/Low | 2 = security name | 3 = ISIN | 4 = status (xd/cd)
+#   5 = High | 6 = Low | 7 = VWAP | 8 = Previous | 9 = Volume
+_C_NAME, _C_ISIN, _C_STATUS = 2, 3, 4
+_C_HIGH, _C_LOW, _C_VWAP, _C_PREV, _C_VOL = 5, 6, 7, 8, 9
+
+
+def _cell(row, i):
+    return row.iloc[i] if i < len(row) else None
+
+
 def _parse_row(row, date: str) -> dict | None:
-    """Extract one securities record from a DataFrame row. Returns None to skip."""
-    if pd.isna(row.iloc[0]) or not isinstance(row.iloc[0], str):
+    """Extract one security record from a Price-List row. Returns None for header
+    and sector-title rows (which have no 'Ord' in the name column)."""
+    name_cell = _cell(row, _C_NAME)
+    if not isinstance(name_cell, str):
+        return None
+    security = name_cell.strip()
+    if "Ord" not in security:          # sector headers / titles lack "Ord X.XX"
         return None
 
-    security = row.iloc[0].strip()
-    if "Ord" not in security:
-        return None
-
-    col1 = str(row.iloc[1]).strip() if not pd.isna(row.iloc[1]) else ""
-    has_isin = col1.startswith("KE") and len(col1) == 12
-
-    if has_isin:
-        total_shares, market_cap, vwap, high, low = (
-            row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[5], row.iloc[6],
-        )
-    else:
-        total_shares, market_cap, vwap, high, low = (
-            row.iloc[1], row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[5],
-        )
-
+    isin = _cell(row, _C_ISIN)
+    isin = str(isin).strip() if not pd.isna(isin) else ""
     return {
+        "Security": security,
         "Date": date,
-        "Total Shares Issued": total_shares,
-        "Market Cap": market_cap,
-        "Weighted Price": vwap,
-        "Highest Price": high,
-        "Lowest Price": low,
+        "ISIN": isin,
+        "Highest Price": _cell(row, _C_HIGH),
+        "Lowest Price": _cell(row, _C_LOW),
+        "Weighted Price": _cell(row, _C_VWAP),   # VWAP — the day's price
+        "Previous Price": _cell(row, _C_PREV),   # fallback when not traded
+        "Volume": _cell(row, _C_VOL),
     }
 
 
 def _read_sheet(path: Path) -> pd.DataFrame | None:
-    """Try to read the first available sheet from an XLS/XLSX file."""
-    for sheet in ("Sheet1", 0):
+    """Read the price-list sheet with header=None so column positions are stable.
+    Prefers the 'Price-List' sheet (current format), falling back to older names."""
+    for sheet in ("Price-List", "Sheet1", 0):
         try:
-            return pd.read_excel(path, sheet_name=sheet)
+            df = pd.read_excel(path, sheet_name=sheet, header=None)
+            if df is not None and not df.empty:
+                return df
         except Exception:
             pass
     logger.warning("Could not read any sheet from %s", path.name)
@@ -170,7 +241,7 @@ def compile_securities(
         for _, row in df.iterrows():
             record = _parse_row(row, date)
             if record:
-                securities_data[row.iloc[0].strip()].append(record)
+                securities_data[record["Security"]].append(record)
 
     written: dict[str, Path] = {}
     for security, records in securities_data.items():
@@ -211,6 +282,43 @@ def _strip_ord_suffix(name: str) -> str:
     return re.sub(r"\s+[Oo]rd[\s._].*$", "", name).strip()
 
 
+# Generic corporate tokens that don't identify a company — stripped before
+# fuzzy matching so 'Unga Group Ltd' matches registry 'Unga Group Plc', etc.
+_CORP_STOP = {"plc", "ltd", "limited", "co", "company", "the", "group",
+              "holdings", "kenya", "k"}
+
+
+def _tokens(s: str, drop_stop: bool = False) -> set[str]:
+    toks = set(re.sub(r"[^a-z0-9 ]", " ", s.lower()).split())
+    return toks - _CORP_STOP if drop_stop else toks
+
+
+def _resolve_ticker(clean_name: str, ticker_map: dict[str, str]) -> str | None:
+    """Resolve a security name to a ticker. Exact match first, then a token-subset
+    match on distinctive tokens (generic 'Plc/Ltd/Group/Kenya…' stripped), so the
+    registry name ('Kapchorua Tea') matches the file's fuller name ('Kapchorua
+    Tea Kenya Plc'). Prefers the most-specific (longest) registry match."""
+    key = clean_name.lower().strip()
+    if key in ticker_map:
+        return ticker_map[key]
+    sec = _tokens(clean_name, drop_stop=True)
+    if not sec:
+        return None
+    best, best_n = None, 0
+    for name, ticker in ticker_map.items():
+        ct = _tokens(name, drop_stop=True)
+        if not ct or not (ct <= sec):
+            continue
+        # A single distinctive token (e.g. {equity}) must match EXACTLY, not as a
+        # subset — otherwise "Equity Afia Ltd" would wrongly resolve to Equity
+        # Group. Multi-token registry names may match as a subset.
+        if len(ct) == 1 and ct != sec:
+            continue
+        if len(ct) > best_n:
+            best, best_n = ticker, len(ct)
+    return best
+
+
 def build_prices_csv(
     compiled_dir: str,
     output_csv: str,
@@ -249,7 +357,7 @@ def build_prices_csv(
             # "KCB Group Plc Ord 1_00.xlsx" → strip "Ord..." → "KCB Group Plc"
             raw_name = xlsx.stem          # e.g. "KCB Group Plc Ord 1_00"
             clean = _strip_ord_suffix(raw_name)
-            ticker = ticker_map.get(clean.lower())
+            ticker = _resolve_ticker(clean, ticker_map)
 
             if not ticker:
                 logger.warning("No ticker found for '%s' (file: %s) — skipped", clean, xlsx.name)
@@ -264,7 +372,10 @@ def build_prices_csv(
 
             for _, row in df.iterrows():
                 raw_date = row.get("Date", "")
+                # VWAP is the traded price; fall back to Previous when untraded
                 price = row.get("Weighted Price")
+                if pd.isna(price):
+                    price = row.get("Previous Price")
                 if pd.isna(price) or raw_date == "":
                     continue
                 iso_date = _normalise_date(str(raw_date))
@@ -346,6 +457,15 @@ def main() -> None:
     dl.add_argument("--end",   required=True, type=_parse_date, metavar="YYYY-MM-DD")
     dl.add_argument("--out",   default=DEFAULT_DOWNLOAD_DIR)
     dl.add_argument("--base-url", default=BASE_URL)
+    dl.add_argument("--date-format", default=DATE_FORMAT,
+                    help=r"strftime for the filename date (default %%d-%%B-%%Y)")
+    dl.add_argument("--ext", default=FILE_EXT, help="file extension (default .xls)")
+
+    pr = sub.add_parser("probe", help="Test one date's URL and report what it returns")
+    pr.add_argument("--date", required=True, type=_parse_date, metavar="YYYY-MM-DD")
+    pr.add_argument("--base-url", default=BASE_URL)
+    pr.add_argument("--date-format", default=DATE_FORMAT)
+    pr.add_argument("--ext", default=FILE_EXT)
 
     cp = sub.add_parser("compile", help="Compile downloaded files into per-security XLSX")
     cp.add_argument("--in",  dest="input_folder",  required=True)
@@ -377,7 +497,20 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.cmd == "download":
-        download_price_lists(args.start, args.end, args.out, args.base_url)
+        download_price_lists(args.start, args.end, args.out, args.base_url,
+                             args.date_format, args.ext)
+
+    elif args.cmd == "probe":
+        info = probe_url(args.date, args.base_url, args.date_format, args.ext)
+        print("\nPROBE RESULT")
+        for k, v in info.items():
+            print(f"  {k:14}: {v}")
+        if info.get("is_spreadsheet"):
+            print("\n  [OK] This URL returns a real spreadsheet - the importer will work.\n")
+        else:
+            print("\n  [FAIL] Not a spreadsheet. Try another --date-format / --base-url / --ext,\n"
+                  "    or copy the real URL from your browser's Network tab on the page that\n"
+                  "    downloads the price list, then pass it via --base-url.\n")
 
     elif args.cmd == "compile":
         compile_securities(args.input_folder, args.output_folder)

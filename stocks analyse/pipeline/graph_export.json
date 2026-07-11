@@ -1,0 +1,2559 @@
+{
+  "companies": [
+    {
+      "symbol": "ABSA",
+      "name": "Absa Bank Kenya Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "BKG",
+      "name": "BK Group Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "DTK",
+      "name": "Diamond Trust Bank Kenya",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "EQTY",
+      "name": "Equity Group Holdings Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "HFCK",
+      "name": "HF Group Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "IMH",
+      "name": "I&M Holdings Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "KCB",
+      "name": "KCB Group Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "NCBA",
+      "name": "NCBA Group Plc",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "SCBK",
+      "name": "Standard Chartered Bank Kenya",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "COOP",
+      "name": "Co-operative Bank of Kenya",
+      "sector": "Banking"
+    },
+    {
+      "symbol": "BRIT",
+      "name": "Britam Holdings Plc",
+      "sector": "Insurance"
+    },
+    {
+      "symbol": "CIC",
+      "name": "CIC Insurance Group",
+      "sector": "Insurance"
+    },
+    {
+      "symbol": "JUB",
+      "name": "Jubilee Holdings Ltd",
+      "sector": "Insurance"
+    },
+    {
+      "symbol": "KNRE",
+      "name": "Kenya Reinsurance Corp",
+      "sector": "Insurance"
+    },
+    {
+      "symbol": "LBTY",
+      "name": "Liberty Kenya Holdings",
+      "sector": "Insurance"
+    },
+    {
+      "symbol": "SLAM",
+      "name": "Sanlam Kenya Plc",
+      "sector": "Insurance"
+    },
+    {
+      "symbol": "SCOM",
+      "name": "Safaricom Plc",
+      "sector": "Telco"
+    },
+    {
+      "symbol": "KEGN",
+      "name": "KenGen Plc",
+      "sector": "Energy"
+    },
+    {
+      "symbol": "KPLC",
+      "name": "Kenya Power & Lighting Co.",
+      "sector": "Energy"
+    },
+    {
+      "symbol": "TOTL",
+      "name": "TotalEnergies Marketing Kenya",
+      "sector": "Energy"
+    },
+    {
+      "symbol": "UMME",
+      "name": "Umeme Ltd",
+      "sector": "Energy"
+    },
+    {
+      "symbol": "BAT",
+      "name": "British American Tobacco Kenya",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "EABL",
+      "name": "East African Breweries Ltd",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "UNGA",
+      "name": "Unga Group Plc",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "EVRD",
+      "name": "Eveready East Africa",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "CARB",
+      "name": "Carbacid Investments",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "BOC",
+      "name": "BOC Kenya",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "FTGH",
+      "name": "Flame Tree Group Holdings",
+      "sector": "Manufacturing"
+    },
+    {
+      "symbol": "BAMB",
+      "name": "Bamburi Cement Plc",
+      "sector": "Construction"
+    },
+    {
+      "symbol": "PORT",
+      "name": "East African Portland Cement",
+      "sector": "Construction"
+    },
+    {
+      "symbol": "CRWN",
+      "name": "Crown Paints Kenya Plc",
+      "sector": "Construction"
+    },
+    {
+      "symbol": "CABL",
+      "name": "East African Cables",
+      "sector": "Construction"
+    },
+    {
+      "symbol": "EGAD",
+      "name": "Eaagads Ltd",
+      "sector": "Agriculture"
+    },
+    {
+      "symbol": "KUKZ",
+      "name": "Kakuzi Plc",
+      "sector": "Agriculture"
+    },
+    {
+      "symbol": "KAPC",
+      "name": "Kapchorua Tea",
+      "sector": "Agriculture"
+    },
+    {
+      "symbol": "LIMT",
+      "name": "Limuru Tea",
+      "sector": "Agriculture"
+    },
+    {
+      "symbol": "SASN",
+      "name": "Sasini Plc",
+      "sector": "Agriculture"
+    },
+    {
+      "symbol": "WTK",
+      "name": "Williamson Tea Kenya",
+      "sector": "Agriculture"
+    },
+    {
+      "symbol": "NMG",
+      "name": "Nation Media Group",
+      "sector": "Media"
+    },
+    {
+      "symbol": "SGL",
+      "name": "Standard Group Plc",
+      "sector": "Media"
+    },
+    {
+      "symbol": "SCAN",
+      "name": "Scangroup Plc",
+      "sector": "Media"
+    },
+    {
+      "symbol": "KQ",
+      "name": "Kenya Airways Plc",
+      "sector": "Transport"
+    },
+    {
+      "symbol": "TPSE",
+      "name": "TPS Eastern Africa (Serena)",
+      "sector": "Hospitality"
+    },
+    {
+      "symbol": "CTUM",
+      "name": "Centum Investment Company",
+      "sector": "Investment"
+    },
+    {
+      "symbol": "TCL",
+      "name": "TransCentury Plc",
+      "sector": "Investment"
+    },
+    {
+      "symbol": "OCH",
+      "name": "Olympia Capital Holdings",
+      "sector": "Investment"
+    },
+    {
+      "symbol": "NSE",
+      "name": "Nairobi Securities Exchange Plc",
+      "sector": "Investment"
+    },
+    {
+      "symbol": "HAFR",
+      "name": "Home Afrika Ltd",
+      "sector": "Real Estate"
+    },
+    {
+      "symbol": "CGEN",
+      "name": "Car & General Kenya",
+      "sector": "Automotive"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ABSA",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Banking",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "BKG",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "DTK",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "EQTY",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "HFCK",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "IMH",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "KCB",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "NCBA",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "SCBK",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "COOP",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "BRIT",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Insurance",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "CIC",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "JUB",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "KNRE",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "LBTY",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "SLAM",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "SCOM",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Telco",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "KEGN",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Energy",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "KPLC",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "TOTL",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "UMME",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "BAT",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Manufacturing",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "EABL",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "UNGA",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "EVRD",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "CARB",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "BOC",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "FTGH",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "BAMB",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Construction",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "PORT",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "CRWN",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "CABL",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "EGAD",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Agriculture",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "KUKZ",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "KAPC",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "LIMT",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "SASN",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "WTK",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "NMG",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Media",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "SGL",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "SCAN",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "KQ",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Transport",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "TPSE",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Hospitality",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "CTUM",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Investment",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "TCL",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "OCH",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "NSE",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "HAFR",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Real Estate",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "CGEN",
+      "kind": "company",
+      "tradeable": true
+    },
+    {
+      "id": "sector:Automotive",
+      "kind": "sector",
+      "tradeable": false
+    },
+    {
+      "id": "Airtel Kenya",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Telkom Kenya",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Vivo Energy",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Rubis",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Savannah Cement",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Basco Paints",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Aberdare Cables",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Ethiopian Airlines",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "RwandAir",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "Sarova Hotels",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "product:Boeing 737 MAX",
+      "kind": "product",
+      "tradeable": false
+    },
+    {
+      "id": "Boeing",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "product:Boeing 787 Dreamliner",
+      "kind": "product",
+      "tradeable": false
+    },
+    {
+      "id": "product:Embraer E190",
+      "kind": "product",
+      "tradeable": false
+    },
+    {
+      "id": "Embraer",
+      "kind": "company",
+      "tradeable": false
+    },
+    {
+      "id": "driver:CBK rate",
+      "kind": "driver",
+      "tradeable": false
+    },
+    {
+      "id": "driver:KES/USD",
+      "kind": "driver",
+      "tradeable": false
+    },
+    {
+      "id": "driver:Oil price",
+      "kind": "driver",
+      "tradeable": false
+    },
+    {
+      "id": "driver:Tea price",
+      "kind": "driver",
+      "tradeable": false
+    },
+    {
+      "id": "driver:Construction demand",
+      "kind": "driver",
+      "tradeable": false
+    }
+  ],
+  "edges": [
+    {
+      "src": "ABSA",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "ABSA",
+      "dst": "EQTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "ABSA",
+      "dst": "KCB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "ABSA",
+      "dst": "SCBK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "ABSA",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "ABSA",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "BKG",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "DTK",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "EQTY",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "HFCK",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "IMH",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "KCB",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "NCBA",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "SCBK",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Banking",
+      "dst": "COOP",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "BKG",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BKG",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "DTK",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "DTK",
+      "dst": "IMH",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "DTK",
+      "dst": "KCB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "DTK",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "EQTY",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "EQTY",
+      "dst": "KCB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "EQTY",
+      "dst": "COOP",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "EQTY",
+      "dst": "NCBA",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "EQTY",
+      "dst": "ABSA",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "EQTY",
+      "dst": "IMH",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "EQTY",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "HFCK",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "HFCK",
+      "dst": "COOP",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "HFCK",
+      "dst": "KCB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "HFCK",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "IMH",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "IMH",
+      "dst": "KCB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "IMH",
+      "dst": "EQTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "IMH",
+      "dst": "DTK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "IMH",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KCB",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KCB",
+      "dst": "EQTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KCB",
+      "dst": "NCBA",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KCB",
+      "dst": "ABSA",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KCB",
+      "dst": "IMH",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KCB",
+      "dst": "DTK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KCB",
+      "dst": "HFCK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KCB",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "NCBA",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "NCBA",
+      "dst": "EQTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "NCBA",
+      "dst": "KCB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "NCBA",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "SCBK",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "SCBK",
+      "dst": "ABSA",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SCBK",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "COOP",
+      "dst": "sector:Banking",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "COOP",
+      "dst": "EQTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "COOP",
+      "dst": "HFCK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "COOP",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "BRIT",
+      "dst": "sector:Insurance",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BRIT",
+      "dst": "CIC",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "BRIT",
+      "dst": "JUB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "BRIT",
+      "dst": "SLAM",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "BRIT",
+      "dst": "LBTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "sector:Insurance",
+      "dst": "BRIT",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Insurance",
+      "dst": "CIC",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Insurance",
+      "dst": "JUB",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Insurance",
+      "dst": "KNRE",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Insurance",
+      "dst": "LBTY",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Insurance",
+      "dst": "SLAM",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "CIC",
+      "dst": "sector:Insurance",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CIC",
+      "dst": "BRIT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "CIC",
+      "dst": "JUB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "JUB",
+      "dst": "sector:Insurance",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "JUB",
+      "dst": "BRIT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "JUB",
+      "dst": "CIC",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KNRE",
+      "dst": "sector:Insurance",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "LBTY",
+      "dst": "sector:Insurance",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "LBTY",
+      "dst": "SLAM",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "LBTY",
+      "dst": "BRIT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SLAM",
+      "dst": "sector:Insurance",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "SLAM",
+      "dst": "BRIT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SLAM",
+      "dst": "LBTY",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SCOM",
+      "dst": "sector:Telco",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "SCOM",
+      "dst": "Airtel Kenya",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SCOM",
+      "dst": "Telkom Kenya",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "sector:Telco",
+      "dst": "SCOM",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "KEGN",
+      "dst": "sector:Energy",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KEGN",
+      "dst": "KPLC",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "KEGN",
+      "dst": "CABL",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "KEGN",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Energy",
+      "dst": "KEGN",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Energy",
+      "dst": "KPLC",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Energy",
+      "dst": "TOTL",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Energy",
+      "dst": "UMME",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "KPLC",
+      "dst": "sector:Energy",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KPLC",
+      "dst": "KEGN",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "KPLC",
+      "dst": "CABL",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "KPLC",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KPLC",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KPLC",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "TOTL",
+      "dst": "sector:Energy",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "TOTL",
+      "dst": "Vivo Energy",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "TOTL",
+      "dst": "Rubis",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "TOTL",
+      "dst": "KQ",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "TOTL",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "TOTL",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "UMME",
+      "dst": "sector:Energy",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BAT",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BAT",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "BAT",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "EABL",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "UNGA",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "EVRD",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "CARB",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "BOC",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Manufacturing",
+      "dst": "FTGH",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "EABL",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "EABL",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "EABL",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "UNGA",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "UNGA",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "UNGA",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "EVRD",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CARB",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CARB",
+      "dst": "BOC",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "BOC",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BOC",
+      "dst": "CARB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "FTGH",
+      "dst": "sector:Manufacturing",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BAMB",
+      "dst": "sector:Construction",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "BAMB",
+      "dst": "PORT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "BAMB",
+      "dst": "Savannah Cement",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "BAMB",
+      "dst": "HAFR",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "BAMB",
+      "dst": "CGEN",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "BAMB",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "BAMB",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "BAMB",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "BAMB",
+      "dst": "driver:Construction demand",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Construction",
+      "dst": "BAMB",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Construction",
+      "dst": "PORT",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Construction",
+      "dst": "CRWN",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Construction",
+      "dst": "CABL",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "PORT",
+      "dst": "sector:Construction",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "PORT",
+      "dst": "BAMB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "PORT",
+      "dst": "Savannah Cement",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "PORT",
+      "dst": "HAFR",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "PORT",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "PORT",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "PORT",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "PORT",
+      "dst": "driver:Construction demand",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "CRWN",
+      "dst": "sector:Construction",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CRWN",
+      "dst": "Basco Paints",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "CRWN",
+      "dst": "HAFR",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "CRWN",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "CRWN",
+      "dst": "driver:Construction demand",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "CABL",
+      "dst": "sector:Construction",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CABL",
+      "dst": "Aberdare Cables",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "CABL",
+      "dst": "KPLC",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "CABL",
+      "dst": "KEGN",
+      "etype": "supplies",
+      "weight": 0.6
+    },
+    {
+      "src": "CABL",
+      "dst": "driver:Construction demand",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "EGAD",
+      "dst": "sector:Agriculture",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "EGAD",
+      "dst": "WTK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "EGAD",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "EGAD",
+      "dst": "driver:Tea price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Agriculture",
+      "dst": "EGAD",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Agriculture",
+      "dst": "KUKZ",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Agriculture",
+      "dst": "KAPC",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Agriculture",
+      "dst": "LIMT",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Agriculture",
+      "dst": "SASN",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Agriculture",
+      "dst": "WTK",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "KUKZ",
+      "dst": "sector:Agriculture",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KUKZ",
+      "dst": "SASN",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KUKZ",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KUKZ",
+      "dst": "driver:Tea price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KAPC",
+      "dst": "sector:Agriculture",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KAPC",
+      "dst": "LIMT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KAPC",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KAPC",
+      "dst": "driver:Tea price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "LIMT",
+      "dst": "sector:Agriculture",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "LIMT",
+      "dst": "WTK",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "LIMT",
+      "dst": "KAPC",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "LIMT",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "LIMT",
+      "dst": "driver:Tea price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "SASN",
+      "dst": "sector:Agriculture",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "SASN",
+      "dst": "KUKZ",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SASN",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "SASN",
+      "dst": "driver:Tea price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "WTK",
+      "dst": "sector:Agriculture",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "WTK",
+      "dst": "LIMT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "WTK",
+      "dst": "EGAD",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "WTK",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "WTK",
+      "dst": "driver:Tea price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "NMG",
+      "dst": "sector:Media",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "NMG",
+      "dst": "SGL",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "sector:Media",
+      "dst": "NMG",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Media",
+      "dst": "SGL",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Media",
+      "dst": "SCAN",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "SGL",
+      "dst": "sector:Media",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "SGL",
+      "dst": "NMG",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "SCAN",
+      "dst": "sector:Media",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KQ",
+      "dst": "sector:Transport",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "KQ",
+      "dst": "Ethiopian Airlines",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KQ",
+      "dst": "RwandAir",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "KQ",
+      "dst": "product:Boeing 737 MAX",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "KQ",
+      "dst": "product:Boeing 787 Dreamliner",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "KQ",
+      "dst": "product:Embraer E190",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "KQ",
+      "dst": "TOTL",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "KQ",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "KQ",
+      "dst": "driver:Oil price",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Transport",
+      "dst": "KQ",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "TPSE",
+      "dst": "sector:Hospitality",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "TPSE",
+      "dst": "Sarova Hotels",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "sector:Hospitality",
+      "dst": "TPSE",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "CTUM",
+      "dst": "sector:Investment",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CTUM",
+      "dst": "TCL",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "CTUM",
+      "dst": "OCH",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "CTUM",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Investment",
+      "dst": "CTUM",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Investment",
+      "dst": "TCL",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Investment",
+      "dst": "OCH",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "sector:Investment",
+      "dst": "NSE",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "TCL",
+      "dst": "sector:Investment",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "TCL",
+      "dst": "CTUM",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "TCL",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "OCH",
+      "dst": "sector:Investment",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "OCH",
+      "dst": "CTUM",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "NSE",
+      "dst": "sector:Investment",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "HAFR",
+      "dst": "sector:Real Estate",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "HAFR",
+      "dst": "BAMB",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "HAFR",
+      "dst": "PORT",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "HAFR",
+      "dst": "CRWN",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "HAFR",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Real Estate",
+      "dst": "HAFR",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "CGEN",
+      "dst": "sector:Automotive",
+      "etype": "in_sector",
+      "weight": 0.9
+    },
+    {
+      "src": "CGEN",
+      "dst": "BAMB",
+      "etype": "supplied_by",
+      "weight": 0.6
+    },
+    {
+      "src": "CGEN",
+      "dst": "driver:CBK rate",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "CGEN",
+      "dst": "driver:KES/USD",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "CGEN",
+      "dst": "driver:Construction demand",
+      "etype": "moved_by",
+      "weight": 0.7
+    },
+    {
+      "src": "sector:Automotive",
+      "dst": "CGEN",
+      "etype": "has_member",
+      "weight": 0.9
+    },
+    {
+      "src": "Airtel Kenya",
+      "dst": "SCOM",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Telkom Kenya",
+      "dst": "SCOM",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Vivo Energy",
+      "dst": "TOTL",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Rubis",
+      "dst": "TOTL",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Savannah Cement",
+      "dst": "BAMB",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Savannah Cement",
+      "dst": "PORT",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Basco Paints",
+      "dst": "CRWN",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Aberdare Cables",
+      "dst": "CABL",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Ethiopian Airlines",
+      "dst": "KQ",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Ethiopian Airlines",
+      "dst": "product:Boeing 737 MAX",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "Ethiopian Airlines",
+      "dst": "product:Boeing 787 Dreamliner",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "RwandAir",
+      "dst": "KQ",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "RwandAir",
+      "dst": "product:Boeing 787 Dreamliner",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "RwandAir",
+      "dst": "product:Embraer E190",
+      "etype": "operates",
+      "weight": 0.8
+    },
+    {
+      "src": "Sarova Hotels",
+      "dst": "TPSE",
+      "etype": "competitor",
+      "weight": 0.5
+    },
+    {
+      "src": "Boeing",
+      "dst": "product:Boeing 737 MAX",
+      "etype": "manufactures",
+      "weight": 0.8
+    },
+    {
+      "src": "Boeing",
+      "dst": "product:Boeing 787 Dreamliner",
+      "etype": "manufactures",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 737 MAX",
+      "dst": "Boeing",
+      "etype": "made_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 737 MAX",
+      "dst": "KQ",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 737 MAX",
+      "dst": "Ethiopian Airlines",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 787 Dreamliner",
+      "dst": "Boeing",
+      "etype": "made_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 787 Dreamliner",
+      "dst": "KQ",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 787 Dreamliner",
+      "dst": "Ethiopian Airlines",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Boeing 787 Dreamliner",
+      "dst": "RwandAir",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "Embraer",
+      "dst": "product:Embraer E190",
+      "etype": "manufactures",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Embraer E190",
+      "dst": "Embraer",
+      "etype": "made_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Embraer E190",
+      "dst": "KQ",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "product:Embraer E190",
+      "dst": "RwandAir",
+      "etype": "operated_by",
+      "weight": 0.8
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "KCB",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "EQTY",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "COOP",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "ABSA",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "NCBA",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "SCBK",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "DTK",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "IMH",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "BKG",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "HFCK",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "HAFR",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "KPLC",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "KEGN",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "BAMB",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "PORT",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "CRWN",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "CGEN",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "TCL",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:CBK rate",
+      "dst": "CTUM",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "WTK",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "KAPC",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "LIMT",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "SASN",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "KUKZ",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "EGAD",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "KQ",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "BAMB",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "PORT",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "EABL",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "UNGA",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "BAT",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "TOTL",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "KPLC",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:KES/USD",
+      "dst": "CGEN",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "TOTL",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "KQ",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "BAMB",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "PORT",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "EABL",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "UNGA",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Oil price",
+      "dst": "KPLC",
+      "etype": "hurts_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Tea price",
+      "dst": "WTK",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Tea price",
+      "dst": "KAPC",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Tea price",
+      "dst": "LIMT",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Tea price",
+      "dst": "SASN",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Tea price",
+      "dst": "KUKZ",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Tea price",
+      "dst": "EGAD",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Construction demand",
+      "dst": "BAMB",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Construction demand",
+      "dst": "PORT",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Construction demand",
+      "dst": "CRWN",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Construction demand",
+      "dst": "CABL",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    },
+    {
+      "src": "driver:Construction demand",
+      "dst": "CGEN",
+      "etype": "helps_when_up",
+      "weight": 0.7
+    }
+  ]
+}

@@ -46,6 +46,29 @@ def _date_to_str(d: datetime.date) -> str:
     return d.strftime("%Y-%m-%d")
 
 
+def parse_date(raw) -> "datetime.date | None":
+    """Tolerant date parsing. Accepts 'YYYY-MM-DD', ISO datetimes
+    ('2024-06-04T10:00:00Z'), and common variants. Returns None if unusable.
+    Production news dates arrive in several shapes; parsing only one silently
+    dropped everything else."""
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    if not s:
+        return None
+    # ISO date or datetime: the leading 10 chars are YYYY-MM-DD
+    try:
+        return datetime.strptime(s[:10], "%Y-%m-%d").date()
+    except ValueError:
+        pass
+    for fmt in ("%d-%B-%Y", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d"):
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            pass
+    return None
+
+
 def get_price_change(
     prices: dict,
     ticker: str,
@@ -61,10 +84,9 @@ def get_price_change(
     Searches up to 5 calendar days forward from each target date
     to handle weekends and holidays.
     """
-    try:
-        base_date = datetime.strptime(from_date, "%Y-%m-%d").date()
-    except Exception:
-        logger.exception("Invalid from_date format: %s", from_date)
+    base_date = parse_date(from_date)
+    if base_date is None:
+        logger.warning("Unparseable article date, skipping: %r", from_date)
         return (None, None, None)
 
     # find price_t0 searching up to 5 calendar days forward
@@ -161,9 +183,12 @@ def align(
         pred = item.get("prediction") if isinstance(item, dict) and "prediction" in item else item
         if not pred:
             continue
-        article_date = None
-        dq = pred.get("data_quality") or {}
-        article_date = dq.get("article_date") or None
+        # lean schema puts article_date at top level; older data nests it in
+        # data_quality — support both.
+        article_date = pred.get("article_date")
+        if not article_date:
+            article_date = (pred.get("data_quality") or {}).get("article_date")
+        article_date = article_date or None
         for group_name in ("directly_affected", "indirectly_affected"):
             for ent in pred.get(group_name, []) or []:
                 t = ent.get("ticker")
@@ -171,9 +196,15 @@ def align(
                     continue
                 direction = ent.get("direction")
                 confidence = ent.get("confidence")
+                # graph-propagated entities carry a signed magnitude estimate
+                predicted_magnitude = ent.get("magnitude_pct")
                 price_t0, price_tn, pct = get_price_change(prices, t, article_date or "", lookahead_days=lookahead_days)
                 price_label = generate_label(pct, threshold)
                 is_correct = (direction == price_label) if (direction in ("UP", "DOWN", "NEUTRAL")) else False
+                # absolute error between predicted and realised move (when both known)
+                magnitude_error = None
+                if isinstance(predicted_magnitude, (int, float)) and isinstance(pct, (int, float)):
+                    magnitude_error = abs(float(predicted_magnitude) - float(pct))
                 total_checks += 1
                 if is_correct:
                     correct += 1
@@ -185,9 +216,11 @@ def align(
                         "impact_type": ent.get("impact_type"),
                         "predicted_direction": direction,
                         "predicted_confidence": confidence,
+                        "predicted_magnitude": predicted_magnitude,
                         "price_t0": price_t0,
                         "price_tn": price_tn,
                         "pct_change": pct,
+                        "magnitude_error": magnitude_error,
                         "price_label": price_label,
                         "correct": is_correct,
                     }

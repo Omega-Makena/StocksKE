@@ -58,13 +58,19 @@ StocksKE/
 │       └── test_importer.py
 │
 ├── pipeline/                   # News-driven LLM prediction pipeline
-│   ├── collector.py            # News API + Business Daily scraper
-│   ├── extractor.py            # LLM analysis → structured predictions
+│   ├── collector.py            # Keyless Kenyan news RSS (Standard/Nation/…) + optional NewsAPI
+│   ├── extractor.py            # LLM analysis → source event (entities, severity)
 │   ├── validator.py            # Hallucination filter
+│   ├── graph.py                # Knowledge graph + impact-propagation engine
+│   ├── graph_data.json         # Curated graph structure (products/drivers/suppliers)
+│   ├── graph_sources.py        # Data-derived edges (price co-movement, co-occurrence)
+│   ├── graph_export.json       # Full graph export (consumed by production loader)
 │   ├── aligner.py              # Join predictions with realised prices
+│   ├── calibrate.py            # Fit propagation magnitude to realised moves
 │   ├── pipeline.py             # Orchestrator (runs all steps)
-│   ├── backtest.py             # Accuracy evaluation
-│   ├── companies.py            # NSE company registry (46 equities)
+│   ├── backtest.py             # Accuracy evaluation (raw, single-horizon)
+│   ├── harness.py              # Honest event-study backtest (abnormal returns)
+│   ├── companies.py            # NSE company registry (49 equities)
 │   ├── config.py               # All settings via env vars
 │   ├── requirements.txt
 │   └── tests/
@@ -111,7 +117,7 @@ cp .env.example .env          # fill in your API keys
 pip install -r pipeline/requirements.txt
 
 # Importer (uses pandas + requests)
-pip install requests pandas openpyxl python-dotenv
+pip install requests pandas openpyxl xlrd python-dotenv   # xlrd is required to read the .xls price lists
 ```
 
 ### 3 — Download and compile price data
@@ -160,6 +166,54 @@ python backtest.py --demo
 python backtest.py --json
 ```
 
+### 5a — Honest event-study backtest
+
+`backtest.py` labels on *raw* price change over one horizon — good for a smoke
+test, misleading as evidence. `harness.py` is the trustworthy evaluation:
+
+```bash
+cd pipeline
+python harness.py --predictions nse_dataset/extractions/extractions_XXXX.jsonl \
+                  --prices ../prices.csv --horizons 1,3,5
+```
+
+It is **point-in-time** (betas, liquidity and momentum for an event at date D use
+only data before D — no lookahead), labels on **abnormal returns**
+(`AR = R_stock − β·R_market`, so index-wide moves are removed), **filters
+illiquid names** (stale/absent prices), **flags corporate actions** (implausible
+single-day jumps it can't adjust for), scores **multiple horizons**, and — most
+importantly — reports the model against **baselines** (always-NEUTRAL, majority,
+random, momentum). If it can't beat those, the "accuracy" is noise. It also
+reports magnitude MAE and a confidence-calibration curve.
+
+> Note: NSE prices are daily closes, so the spec's "1 hour" horizon isn't
+> achievable without an intraday feed. Corporate-action handling is a heuristic
+> jump-filter, not a true adjusted-close.
+
+### 5b — Calibrate the propagation engine
+
+Two levels of calibration, both persisted to `calibration.json` (auto-loaded by
+`graph.py` on import):
+
+```bash
+cd pipeline
+
+# Magnitude fit — MAGNITUDE_SCALE + DIRECTION_THRESHOLD from labeled rows
+python calibrate.py --demo          # self-test: recovers a known scale
+python calibrate.py --write         # fit from nse_dataset/labeled and persist
+
+# Structural fit — HOP_DECAY + per-family channel gains (sector / competitor /
+# product / supplier). Re-propagates each event under candidate coefficients.
+python calibrate.py --demo-structural           # self-test on synthetic events
+python calibrate.py --fit-structural --events events.jsonl --write
+```
+
+The structural fitter needs *event records* (`{event_type, sources, realised}`),
+which `calibrate.build_event_records(predictions, prices_csv)` builds from real
+extractor output + a prices CSV. It fits one gain per channel *family* (not per
+event×edge cell) to avoid over-fitting; the hand-set sign structure in
+`graph.CHANNEL` is preserved.
+
 ### 6 — Run tests
 
 ```bash
@@ -197,10 +251,13 @@ Copy `.env.example` to `.env` and fill in your values. Key variables:
 
 | Variable | Used by | Description |
 |---|---|---|
-| `NEWS_API_KEY` | pipeline, production | [newsapi.org](https://newsapi.org) key |
+| `NEWS_API_KEY` | pipeline, production | [newsapi.org](https://newsapi.org) key — **optional**; without it the collector uses keyless Kenyan RSS feeds (Standard, Nation, Capital FM, KBC, Kenyans.co.ke) |
 | `OPENAI_API_KEY` | pipeline, production | LLM API key |
 | `OPENAI_BASE_URL` | pipeline | Swap in any OpenAI-compatible endpoint |
 | `MODEL_NAME` | pipeline | e.g. `gpt-4o-mini` |
+| `MAX_TOKENS` | pipeline | LLM output cap (default `600` — lean schema) |
+| `MAX_ARTICLE_CHARS` | pipeline | Article truncation before sending (default `1600`) |
+| `PREFILTER_ARTICLES` | pipeline | Skip the LLM for articles with no NSE/macro hit (default `1`) |
 | `COMPILED_DIR` | pipeline | Path to `compiled_securities/` from importer |
 | `PRICE_CHANGE_THRESHOLD` | pipeline | % move to label as UP/DOWN (default `1.5`) |
 | `LOOKAHEAD_DAYS` | pipeline | Days after article to check price (default `3`) |
@@ -219,19 +276,87 @@ See `.env.example` for the full list.
   News article
        │
        ▼
-  collector.py    →  fetches from newsapi.org and businessdailyafrica.com
+  collector.py    →  keyless Kenyan news RSS (Standard/Nation/Capital FM/KBC/
+       │              Kenyans.co.ke) + optional NewsAPI + Business Daily scrape
        │
-  extractor.py    →  LLM reads article, outputs:
-       │              { ticker, direction: UP/DOWN/NEUTRAL, confidence, impact_type }
+  extractor.py    →  LLM reads article, outputs the SOURCE EVENT:
+       │              { event_type, severity, source_entities (companies +
+       │                products, NSE or not), directly_affected }
        │
   validator.py    →  drops hallucinated tickers, invalid directions, bad confidence
        │
+  graph.py        →  propagates impact through the knowledge graph.
+       │              Seeds from source_entities + directly_affected, spreads
+       │              along typed edges (competitor / sector / shared-product /
+       │              supplier) with per-hop decay, and computes each affected
+       │              ticker's { direction, magnitude %, confidence } —
+       │              rebuilding indirectly_affected.
+       │
   aligner.py      →  looks up realised price change (from prices.csv)
-       │              assigns ground-truth label, marks prediction correct/wrong
+       │              assigns ground-truth label, marks correct/wrong,
+       │              records magnitude_error (predicted % vs realised %)
        │
   backtest.py     →  precision · recall · F1 per class
                      accuracy by confidence band, impact type, ticker
 ```
+
+**Knowledge-graph propagation** — the source event drives a typed graph, so a
+foreign/unlisted event reaches NSE names without being named directly:
+
+```
+  Ethiopian Airlines crash (disaster, severity 1.0, DOWN)
+        │  seeds product node
+        ▼
+   product: Boeing 737 MAX
+        │
+   ┌────┴───────────────┐
+   ▼                    ▼
+ Boeing (made_by)   Kenya Airways / KQ  (operated_by → shared-fleet
+ [non-NSE]           contagion → DOWN, magnitude & confidence decayed by hop)
+```
+
+The graph carries four node kinds and several typed edges:
+
+| Node kind | Examples | Role |
+|---|---|---|
+| **company** | KCB, KQ, Boeing*, RwandAir* | tradeable NSE names + non-NSE anchors (*) |
+| **sector** | `sector:Banking` | spillover hub linking peers |
+| **product** | `product:Boeing 737 MAX` | shared physical asset (fleet contagion) |
+| **driver** | `driver:CBK rate`, `driver:Oil price`, `driver:KES/USD` | macro / commodity / shared-input hub |
+
+**Driver nodes** carry the macro & commodity channels. A driver fans out to
+firms via two polarity-typed edges — `helps_when_up` and `hurts_when_up` — so a
+single event moves winners and losers in opposite directions:
+
+```
+  CBK rate  UP  (macro)            Oil price  UP  (commodity)
+     ├── banks           → UP         ├── TOTL (marketer)     → UP
+     └── HFCK/KPLC/BAMB… → DOWN       └── KQ/cement/brewer…   → DOWN
+```
+
+Coefficients (`MAGNITUDE_SCALE`, `HOP_DECAY`, per-family `CHANNEL_GAINS`,
+per-event channel weights) are module constants in `graph.py`, fitted against
+realised prices by `calibrate.py` and persisted to `calibration.json`
+(auto-loaded on import).
+
+### Where the graph comes from (not hardcoded)
+
+The graph is composed from layered sources, so it can grow from data rather than
+code edits:
+
+| Source | Where | What it contributes |
+|---|---|---|
+| **Company registry** | `companies.py` | 49 NSE equities, sectors, competitor pairs |
+| **Curated structure** | `graph_data.json` | products, non-NSE aliases, supplier chains, macro/commodity drivers — edit this file, no code change |
+| **Price co-movement** | `graph_sources.py` | peer edges *discovered* from correlated returns in `prices.csv` |
+| **Article co-occurrence** | `graph_sources.py` | association edges accrued from LLM `source_entities`, so novel entities wire themselves in |
+
+`graph.build_graph(prices_csv=…, extraction_paths=…)` composes them;
+`build_default_graph()` is the curated seed alone. `graph.export_graph()` writes
+`graph_export.json`, the single artifact the production DB loader
+(`production/scripts/load_knowledge_graph.py`) consumes to populate its
+`sectors`, `tickers`, and `graph_edges` tables — one source of truth across both
+processes.
 
 ---
 
@@ -263,7 +388,7 @@ Each LLM prediction looks like this:
 }
 ```
 
-Valid tickers are the 46 NSE-listed equities in `pipeline/companies.py`. Any ticker outside that list is rejected by the validator.
+Valid tickers are the 49 NSE-listed equities in `pipeline/companies.py`. Any ticker outside that list is rejected by the validator.
 
 ---
 
@@ -286,4 +411,5 @@ Valid tickers are the 46 NSE-listed equities in `pipeline/companies.py`. Any tic
 
 ## Documentation
 
-Full module-by-module reference including architecture diagrams, function signatures, and test documentation is in [DOCUMENTATION.md](DOCUMENTATION.md).
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — system architecture with diagrams: data flow, the knowledge graph, graph sourcing, and production notes/limitations.
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** — full module-by-module reference, function signatures, and test documentation.

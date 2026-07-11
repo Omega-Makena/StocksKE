@@ -8,7 +8,26 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from aligner import load_prices, get_price_change, generate_label, align
+from datetime import date
+from aligner import load_prices, get_price_change, generate_label, align, parse_date
+
+
+class TestParseDate:
+    def test_iso_date(self):
+        assert parse_date("2024-06-04") == date(2024, 6, 4)
+
+    def test_iso_datetime_is_accepted(self):
+        # NewsAPI-style timestamps must not be silently dropped
+        assert parse_date("2024-06-04T10:30:00Z") == date(2024, 6, 4)
+        assert parse_date("2024-06-04T10:30:00+03:00") == date(2024, 6, 4)
+
+    def test_day_month_year(self):
+        assert parse_date("04-June-2024") == date(2024, 6, 4)
+
+    def test_garbage_and_empty_return_none(self):
+        assert parse_date("not a date") is None
+        assert parse_date("") is None
+        assert parse_date(None) is None
 
 
 def _make_prices_csv(rows: list[dict]) -> str:

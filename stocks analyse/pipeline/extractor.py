@@ -7,68 +7,129 @@ from pathlib import Path
 
 import requests
 
-from config import OPENAI_API_KEY, OPENAI_BASE_URL, MODEL_NAME, TEMPERATURE, MAX_TOKENS, OUTPUT_DIR
+from config import (
+    OPENAI_API_KEY, OPENAI_BASE_URL, MODEL_NAME, TEMPERATURE, MAX_TOKENS,
+    OUTPUT_DIR, MAX_ARTICLE_CHARS, PREFILTER_ARTICLES, LLM_TIMEOUT,
+)
+from companies import NSE_COMPANIES, VALID_TICKERS
 
 logger = logging.getLogger(__name__)
 USER_AGENT = "NSE-Research-Bot/1.0"
 
-SYSTEM_PROMPT = """
-You are a financial analysis agent for the Nairobi Securities Exchange (NSE), Kenya.
+# Company list is generated from the single source of truth (companies.py) so
+# the prompt can never drift from the graph.
+_COMPANY_LIST = "|".join(f"{c['ticker']}-{c['name']}" for c in NSE_COMPANIES)
 
-Read the news article provided and return a JSON object with your analysis.
+# The prompt is deliberately compact: relationship/competitor reasoning was
+# removed because the knowledge graph now derives all indirect impact, and the
+# output schema is trimmed to only the fields consumed downstream. This is the
+# largest per-call token cost, so keep it lean and STATIC (a static prefix also
+# lets providers with prompt caching reuse it across calls).
+SYSTEM_PROMPT = f"""You are a financial analyst for the Nairobi Securities Exchange (NSE), Kenya.
+Read the article and return ONLY a JSON object (no prose, no markdown fences).
 
-STRICT RULES:
-1. Only reference companies from the COMPANY LIST below. Any ticker not in
-   this list does not exist on the NSE. Do not invent tickers.
-2. Only assert competitor relationships from the RELATIONSHIP LIST below.
-   Do not invent relationships.
-3. direction must be exactly one of: "UP", "DOWN", "NEUTRAL"
-4. impact_type must be exactly one of: "direct", "competitor",
-   "sector_spillover", "supplier_chain", "regulatory"
-5. confidence is a float between 0.0 and 1.0. Do not include companies
-   with confidence below 0.3.
-6. Return ONLY valid JSON. No prose, no markdown fences.
+Return exactly this shape:
+{{"event_type": one of [earnings, regulation, product_launch, disaster, merger_acquisition, macro, commodity, legal, management_change, other],
+ "severity": 0.0-1.0 (0.1 minor, 0.5 notable, 1.0 catastrophic/market-moving),
+ "source_entities": [{{"name": raw entity as reported, "kind": "company"|"product"|"driver", "direction": "UP"|"DOWN"|"NEUTRAL", "severity": 0.0-1.0}}],
+ "directly_affected": [{{"ticker": NSE ticker from COMPANY LIST, "direction": "UP"|"DOWN"|"NEUTRAL", "impact_type": "direct", "confidence": 0.0-1.0}}],
+ "indirectly_affected": [],
+ "article_date": "YYYY-MM-DD"}}
 
-COMPANY LIST:
-ABSA-Absa Bank Kenya Plc|BKG-BK Group Plc|DTK-Diamond Trust Bank Kenya|
-EQTY-Equity Group Holdings Plc|HFCK-HF Group Plc|IMH-I&M Holdings Plc|
-KCB-KCB Group Plc|NCBA-NCBA Group Plc|SCBK-Standard Chartered Bank Kenya|
-COOP-Co-operative Bank of Kenya|BRIT-Britam Holdings Plc|CIC-CIC Insurance Group|
-JUB-Jubilee Holdings Ltd|KNRE-Kenya Reinsurance Corp|LBTY-Liberty Kenya Holdings|
-SLAM-Sanlam Kenya Plc|SCOM-Safaricom Plc|KEGN-KenGen Plc|
-KPLC-Kenya Power & Lighting Co.|TOTL-TotalEnergies Marketing Kenya|
-UMME-Umeme Ltd|BAT-British American Tobacco Kenya|EABL-East African Breweries Ltd|
-UNGA-Unga Group Plc|EVRD-Eveready East Africa|CARB-Carbacid Investments|
-BOC-BOC Kenya|FTGH-Flame Tree Group Holdings|BAMB-Bamburi Cement Plc|
-PORT-East African Portland Cement|CRWN-Crown Paints Kenya Plc|
-CABL-East African Cables|EGAD-Eaagads Ltd|KUKZ-Kakuzi Plc|
-KAPC-Kapchorua Tea|LIMT-Limuru Tea|SASN-Sasini Plc|WTK-Williamson Tea Kenya|
-NMG-Nation Media Group|SGL-Standard Group Plc|SCAN-Scangroup Plc|
-KQ-Kenya Airways Plc|TPSE-TPS Eastern Africa (Serena Hotels)|
-CTUM-Centum Investment Company|TCL-TransCentury Plc|OCH-Olympia Capital Holdings|
-NSE-Nairobi Securities Exchange Plc|HAFR-Home Afrika Ltd|CGEN-Car & General Kenya
+RULES:
+- directly_affected tickers MUST be in the COMPANY LIST; never invent tickers. Drop entities with confidence < 0.3.
+- source_entities are the RAW entities the event is about — INCLUDE foreign/unlisted companies (e.g. Boeing, Ethiopian Airlines), products (e.g. Boeing 737 MAX), and macro/commodity drivers. Do NOT restrict these to the COMPANY LIST.
+- A knowledge graph derives indirect impact from source_entities, so leave "indirectly_affected" as []. Do NOT list competitors, peers, or sector spillovers yourself.
+- A driver "name" MUST be one of: "CBK rate" (UP=rates rising), "KES/USD" (UP=shilling weakening vs USD), "Oil price", "Tea price", "Construction demand"; its "direction" is the driver's own move. Use event_type "macro" for rates/FX/GDP/fiscal and "commodity" for oil/tea/inputs.
 
-RELATIONSHIP LIST (NSE-listed pairs only):
-EQTY↔KCB|EQTY↔COOP|EQTY↔NCBA|EQTY↔ABSA|KCB↔NCBA|KCB↔ABSA|ABSA↔SCBK|
-IMH↔KCB|IMH↔EQTY|DTK↔IMH|DTK↔KCB|HFCK↔COOP|HFCK↔KCB|
-BRIT↔CIC|BRIT↔JUB|BRIT↔SLAM|CIC↔JUB|LBTY↔SLAM|LBTY↔BRIT|
-CARB↔BOC|BAMB↔PORT|SASN↔KUKZ|WTK↔LIMT|LIMT↔KAPC|EGAD↔WTK|
-NMG↔SGL|CTUM↔TCL|OCH↔CTUM
+COMPANY LIST (TICKER-Name):
+{_COMPANY_LIST}
 
-EXAMPLES:
-Input: {"article_text": "KCB Group posts 20% profit jump", "article_date": "2024-03-01", "source": "Business Daily"}
-Output: {"article_summary": "KCB reports 20% profit increase.", "event_type": "earnings", "primary_sector": "Banking", "directly_affected": [{"ticker": "KCB", "company": "KCB Group Plc", "impact_type": "direct", "direction": "UP", "confidence": 0.91, "reasoning": "Strong earnings beat typically drives buying pressure."}], "indirectly_affected": [{"ticker": "EQTY", "company": "Equity Group Holdings Plc", "impact_type": "competitor", "direction": "NEUTRAL", "confidence": 0.42, "reasoning": "Competitor earnings beat may shift investor attention but not necessarily Equity's fundamentals."}], "not_nse_listed": [], "macro_flags": {"currency_risk": false, "interest_rate_sensitive": false, "commodity_price_sensitive": false, "regulatory_change": false}, "data_quality": {"article_date": "2024-03-01", "source_credibility": "high", "ambiguity_notes": ""}}
-"""
+EXAMPLES (input -> output):
+"KCB Group posts 20% profit jump" -> {{"event_type":"earnings","severity":0.6,"source_entities":[{{"name":"KCB Group","kind":"company","direction":"UP","severity":0.6}}],"directly_affected":[{{"ticker":"KCB","direction":"UP","impact_type":"direct","confidence":0.9}}],"indirectly_affected":[],"article_date":"2024-03-01"}}
+"Ethiopian Airlines Boeing 737 MAX crashes, all aboard killed" -> {{"event_type":"disaster","severity":1.0,"source_entities":[{{"name":"Ethiopian Airlines","kind":"company","direction":"DOWN","severity":1.0}},{{"name":"Boeing 737 MAX","kind":"product","direction":"DOWN","severity":1.0}}],"directly_affected":[],"indirectly_affected":[],"article_date":"2024-05-10"}}
+"CBK raises benchmark rate 150bps to tame inflation" -> {{"event_type":"macro","severity":0.7,"source_entities":[{{"name":"CBK rate","kind":"driver","direction":"UP","severity":0.7}}],"directly_affected":[],"indirectly_affected":[],"article_date":"2024-06-05"}}"""
+
+
+# ---------------------------------------------------------------------------
+# Relevance pre-filter — skip the LLM entirely for articles that mention no NSE
+# entity and no macro/commodity trigger. This is the biggest total-token lever:
+# most of a general news feed is irrelevant, and a skipped article costs zero
+# LLM tokens instead of the full ~2k-token call.
+# ---------------------------------------------------------------------------
+
+# Generic words that don't distinguish a company (so "Kenya Bank Group" alone
+# isn't a match, but "Safaricom" or "Bamburi" is).
+_STOPWORDS = {
+    "bank", "group", "holdings", "kenya", "ltd", "plc", "company", "co",
+    "east", "african", "africa", "insurance", "investments", "investment",
+    "marketing", "securities", "exchange", "limited", "the", "and", "of",
+    "reinsurance", "corp", "capital", "power", "lighting", "media", "cement",
+    "paints", "breweries", "tea", "group's",
+}
+
+# Macro / commodity trigger phrases that make an article relevant even with no
+# company named.
+_MACRO_KEYWORDS = {
+    "cbk", "central bank", "interest rate", "benchmark rate", "lending rate",
+    "monetary policy", "inflation", "shilling", "forex", "exchange rate",
+    "dollar", "kes/usd", "devalu", "gdp", "treasury", "fuel", "petrol",
+    "diesel", "oil price", "crude", "epra", "pump price", "tea price",
+    "coffee", "cement", "construction", "budget", "tax", "levy",
+}
+
+
+# Company-name tokens that are also common English / place / political words, so
+# on their own they trigger false positives (e.g. "Limuru" the town vs LIMT the
+# tea stock). Excluded from single-word matching — these companies still match
+# via their ticker or a more distinctive token. Tune as false positives surface.
+_AMBIGUOUS_TOKENS = {
+    "limuru", "liberty", "crown", "flame", "tree", "home", "general",
+    "nation", "standard", "jubilee", "olympia", "centum",
+    # from "Nairobi Securities Exchange Plc" — 'nairobi' alone matches nearly
+    # every Kenyan article; 'securities'/'exchange' are generic finance words.
+    "nairobi", "securities", "exchange",
+}
+
+
+def _build_relevance_terms() -> tuple[set[str], set[str]]:
+    """(single_word_terms, phrase_terms) that mark an article as NSE-relevant."""
+    words: set[str] = {t.lower() for t in VALID_TICKERS}
+    phrases: set[str] = set(_MACRO_KEYWORDS)
+    for c in NSE_COMPANIES:
+        for tok in re.split(r"[^a-z0-9]+", c["name"].lower()):
+            if len(tok) >= 4 and tok not in _STOPWORDS and tok not in _AMBIGUOUS_TOKENS:
+                words.add(tok)
+    # a few distinctive non-NSE anchors worth catching
+    phrases.update({"boeing", "airbus", "ethiopian airlines", "rwandair",
+                    "safaricom", "airtel"})
+    return words, phrases
+
+
+_REL_WORDS, _REL_PHRASES = _build_relevance_terms()
+_REL_WORD_RE = re.compile(r"\b(" + "|".join(sorted(map(re.escape, _REL_WORDS), key=len, reverse=True)) + r")\b")
+
+
+def is_relevant(article: dict) -> bool:
+    """True if the article plausibly concerns an NSE name or macro/commodity
+    driver. Conservative: when in doubt it returns True (a wasted call is
+    cheaper than a missed event)."""
+    text = " ".join(str(article.get(k) or "") for k in ("title", "description", "content")).lower()
+    if not text.strip():
+        return False
+    if _REL_WORD_RE.search(text):
+        return True
+    return any(p in text for p in _REL_PHRASES)
 
 
 def build_user_message(article: dict) -> str:
     """
     Returns a JSON string with keys: article_text, article_date, source.
     article_text = article["content"] or article["description"] or article["title"]
-    Truncate article_text to 2000 characters max.
+    Truncate article_text to MAX_ARTICLE_CHARS to bound input tokens.
     """
     text = (article.get("content") or article.get("description") or article.get("title") or "")
-    text = text[:2000]
+    text = text[:MAX_ARTICLE_CHARS]
     payload = {
         "article_text": text,
         "article_date": article.get("published_at", article.get("publishedAt", "")),
@@ -117,7 +178,7 @@ def call_llm(article: dict, retries: int = 3) -> dict | None:
     attempt = 0
     while attempt < retries:
         try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=15)
+            resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
             if resp.status_code == 429:
                 logger.warning("LLM rate limited (429). Sleeping 60s before retry")
                 time.sleep(60)
@@ -163,7 +224,9 @@ def call_llm(article: dict, retries: int = 3) -> dict | None:
 def extract_all(articles: list[dict]) -> list[dict]:
     """
     Calls call_llm for each article.
-    Skips articles where content+description+title combined < 50 chars.
+    Skips articles that are too short (< 50 chars) or, when PREFILTER_ARTICLES is
+    on, that mention no NSE entity / macro trigger (is_relevant) — the latter
+    avoids the LLM call entirely and is the main token saver.
     Saves to OUTPUT_DIR/extractions/extractions_{timestamp}.jsonl
     Returns list of {article, prediction} dicts.
     Sleeps 0.3s between calls.
@@ -174,14 +237,32 @@ def extract_all(articles: list[dict]) -> list[dict]:
     out_file = out_dir / f"extractions_{ts}.jsonl"
 
     results = []
+    skipped_short = 0
+    skipped_irrelevant = 0
+    called = 0
     for a in articles:
         combined_len = len((a.get("content") or "") + (a.get("description") or "") + (a.get("title") or ""))
         if combined_len < 50:
-            logger.info("Skipping short article: %s", a.get("title") or a.get("url"))
+            skipped_short += 1
+            logger.debug("Skipping short article: %s", a.get("title") or a.get("url"))
+            continue
+        if PREFILTER_ARTICLES and not is_relevant(a):
+            skipped_irrelevant += 1
+            logger.debug("Skipping irrelevant article (no NSE/macro hit): %s", a.get("title") or a.get("url"))
             continue
         pred = call_llm(a)
+        called += 1
+        # Don't trust the model to echo the date back — backfill from the article
+        # so downstream price alignment never silently fails on a missing date.
+        if isinstance(pred, dict) and not pred.get("article_date"):
+            pred["article_date"] = a.get("published_at") or a.get("publishedAt") or ""
         results.append({"article": a, "prediction": pred})
         time.sleep(0.3)
+
+    logger.info(
+        "extract_all: %d articles -> %d LLM calls (skipped %d short, %d irrelevant)",
+        len(articles), called, skipped_short, skipped_irrelevant,
+    )
 
     try:
         with out_file.open("w", encoding="utf-8") as fh:

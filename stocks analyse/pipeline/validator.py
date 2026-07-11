@@ -13,6 +13,7 @@ VALID_EVENT_TYPES = {
     "disaster",
     "merger_acquisition",
     "macro",
+    "commodity",
     "legal",
     "management_change",
     "other",

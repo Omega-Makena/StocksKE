@@ -43,6 +43,7 @@ from extractor import extract_all
 import validator
 from aligner import align
 from companies import NAME_MAP
+from graph import build_graph, enrich_prediction
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +120,11 @@ def run(
     """
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
+    # Fail loudly on obvious misconfiguration rather than silently producing nothing.
+    import config as _cfg
+    for problem in _cfg.validate_config():
+        logger.warning("CONFIG: %s", problem)
+
     out_dir = Path(OUTPUT_DIR)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -177,6 +183,36 @@ def run(
     )
 
     # ------------------------------------------------------------------
+    # Step 3.5: propagate impact through the knowledge graph
+    #   Replaces the LLM's guessed indirectly_affected with graph-derived
+    #   impacts (direction + magnitude % + confidence) seeded from the source
+    #   event (directly_affected + source_entities). The graph is the curated
+    #   seed PLUS data-derived edges (price co-movement + article co-occurrence).
+    # ------------------------------------------------------------------
+    extraction_glob = str(out_dir / "extractions" / "extractions_*.jsonl")
+    graph = build_graph(
+        prices_csv=prices_csv or None,
+        extraction_paths=[extraction_glob],
+    )
+    # Be explicit about calibration status — default coefficients are NOT fitted
+    # to NSE data, so magnitudes are indicative only until calibrate.py has run.
+    import graph as _g
+    if not _g.CALIBRATION_FILE.exists():
+        logger.warning(
+            "Graph is running on DEFAULT (uncalibrated) coefficients — magnitudes "
+            "are indicative only. Run calibrate.py on real labeled data to fit them."
+        )
+    reached_total = 0
+    for i, pred in enumerate(valid):
+        enriched = enrich_prediction(pred, graph)
+        valid[i] = enriched
+        reached_total += enriched.get("propagation", {}).get("reached", 0)
+    logger.info(
+        "Step 3.5: graph propagation enriched %d predictions (%d downstream impacts)",
+        len(valid), reached_total,
+    )
+
+    # ------------------------------------------------------------------
     # Step 4: align predictions against realised prices
     # ------------------------------------------------------------------
     logger.info("Step 4: aligning %d predictions against prices CSV: %s", len(valid), prices_csv)
@@ -200,9 +236,26 @@ def run(
     if labeled:
         correct = sum(1 for r in labeled if r.get("correct"))
         logger.info(
-            "Accuracy on labeled set: %.1f%%  (%d / %d)",
+            "Accuracy on labeled set: %.1f%%  (%d / %d)  [naive: raw change, single horizon]",
             100 * correct / len(labeled), correct, len(labeled),
         )
+
+    # ------------------------------------------------------------------
+    # Step 5: honest event-study scorecard (abnormal returns vs baselines)
+    #   This is the trustworthy number. The naive accuracy above is a smoke
+    #   test; harness.evaluate is point-in-time, market-adjusted, liquidity-
+    #   filtered, and compared against baselines.
+    # ------------------------------------------------------------------
+    if prices_csv and Path(prices_csv).exists():
+        try:
+            import harness
+            events = harness.predictions_to_events(valid)
+            metrics = harness.evaluate(events, prices_csv, horizons=(1, 3, 5))
+            harness.print_report(metrics)
+        except Exception:
+            logger.exception("Event-study scorecard failed (pipeline result is unaffected)")
+    else:
+        logger.info("Step 5: skipped event-study scorecard (no prices CSV available)")
 
     return labeled
 

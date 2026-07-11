@@ -1,49 +1,96 @@
+"""
+Load the knowledge graph into the production DB from the pipeline's canonical
+export (single source of truth), replacing the old hardcoded mock.
+
+Source resolution (first that works):
+  1. $GRAPH_EXPORT_FILE
+  2. <repo>/pipeline/graph_export.json  (monorepo default)
+  3. import the pipeline's graph module and export on the fly
+
+Populates:
+  * sectors      — from the company registry
+  * tickers      — the NSE-listed (tradeable) companies
+  * graph_edges  — the full typed/weighted edge set (companies/products/drivers)
+"""
 import sys
 import os
-import csv
+import json
+from pathlib import Path
+
 import structlog
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.main import SessionLocal
+from app.main import SessionLocal, engine
+from app.models.base import Base
 from app.models.ticker import Ticker, Sector
+from app.models.graph_edge import GraphEdge
 
 logger = structlog.get_logger(__name__)
 
+# repo root = two levels up from this file (production/scripts -> repo)
+_REPO = Path(__file__).resolve().parents[2]
+_PIPELINE = _REPO / "pipeline"
+
+
+def _load_export() -> dict:
+    """Return the graph export dict (companies / nodes / edges)."""
+    candidates = []
+    if os.environ.get("GRAPH_EXPORT_FILE"):
+        candidates.append(Path(os.environ["GRAPH_EXPORT_FILE"]))
+    candidates.append(_PIPELINE / "graph_export.json")
+
+    for path in candidates:
+        if path and path.exists():
+            logger.info("Loading knowledge graph export", path=str(path))
+            return json.loads(path.read_text(encoding="utf-8"))
+
+    # Fall back to generating it directly from the pipeline (local/dev).
+    logger.info("No export file found; generating from pipeline.graph", pipeline=str(_PIPELINE))
+    sys.path.insert(0, str(_PIPELINE))
+    import graph as G  # type: ignore
+    out = G.export_graph()
+    return json.loads(Path(out).read_text(encoding="utf-8"))
+
+
 def load_graph():
-    logger.info("Loading initial Sectors and Tickers knowledge graph.")
-    
-    # Simple hardcoded mock data for Kenya NSE to satisfy system requirements.
-    # Usually you'd read from a CSV: csv.reader(open('knowledge_graph.csv'))
-    
-    sectors_data = ["Telecommunications", "Banking", "Manufacturing", "Energy"]
-    tickers_data = [
-        {"symbol": "SAFCOM", "name": "Safaricom Plc", "sector": "Telecommunications"},
-        {"symbol": "KCB", "name": "KCB Group", "sector": "Banking"},
-        {"symbol": "EABL", "name": "East African Breweries", "sector": "Manufacturing"},
-        {"symbol": "KENGEN", "name": "KenGen", "sector": "Energy"},
-    ]
-    
+    data = _load_export()
+    # ensure tables exist (idempotent; Alembic is preferred in real deploys)
+    Base.metadata.create_all(bind=engine)
+
+    companies = data.get("companies", [])
+    edges = data.get("edges", [])
+
     with SessionLocal() as db:
-        sector_map = {}
-        for s_name in sectors_data:
-            sector = db.query(Sector).filter(Sector.name == s_name).first()
+        # --- sectors ---
+        sector_ids = {}
+        for name in sorted({c["sector"] for c in companies if c.get("sector")}):
+            sector = db.query(Sector).filter(Sector.name == name).first()
             if not sector:
-                sector = Sector(name=s_name)
+                sector = Sector(name=name)
                 db.add(sector)
-                db.commit()
-            sector_map[s_name] = sector.id
-            
-        for t_data in tickers_data:
-            ticker = db.query(Ticker).filter(Ticker.symbol == t_data['symbol']).first()
+                db.flush()
+            sector_ids[name] = sector.id
+
+        # --- tickers (NSE-listed companies) ---
+        for c in companies:
+            ticker = db.query(Ticker).filter(Ticker.symbol == c["symbol"]).first()
             if not ticker:
-                ticker = Ticker(
-                    symbol=t_data['symbol'],
-                    name=t_data['name'],
-                    sector_id=sector_map.get(t_data['sector'])
-                )
+                ticker = Ticker(symbol=c["symbol"])
                 db.add(ticker)
+            ticker.name = c["name"]
+            ticker.sector_id = sector_ids.get(c.get("sector"))
+
+        # --- edges (full graph): refresh from source ---
+        db.query(GraphEdge).delete()
+        for e in edges:
+            db.add(GraphEdge(src=e["src"], dst=e["dst"], etype=e["etype"],
+                             weight=float(e.get("weight", 1.0))))
+
         db.commit()
-        logger.info("Knowledge Graph loaded successfully.")
+        logger.info("Knowledge graph loaded",
+                    sectors=len(sector_ids), tickers=len(companies), edges=len(edges))
+
 
 if __name__ == "__main__":
     load_graph()

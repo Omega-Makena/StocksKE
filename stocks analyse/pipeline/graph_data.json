@@ -1,0 +1,165 @@
+{
+  "_comment": "Curated supplemental knowledge-graph structure. Companies/sectors/competitors come from companies.py; this file adds products, non-NSE aliases, supplier chains and macro/commodity drivers. Edit here (not in code) to grow the curated graph.",
+  "products": [
+    {
+      "product": "Boeing 737 MAX",
+      "made_by": [
+        "Boeing"
+      ],
+      "operated_by": [
+        "Kenya Airways",
+        "Ethiopian Airlines"
+      ]
+    },
+    {
+      "product": "Boeing 787 Dreamliner",
+      "made_by": [
+        "Boeing"
+      ],
+      "operated_by": [
+        "Kenya Airways",
+        "Ethiopian Airlines",
+        "RwandAir"
+      ]
+    },
+    {
+      "product": "Embraer E190",
+      "made_by": [
+        "Embraer"
+      ],
+      "operated_by": [
+        "Kenya Airways",
+        "RwandAir"
+      ]
+    }
+  ],
+  "aliases": {
+    "Kenya Airways": "KQ"
+  },
+  "suppliers": [
+    [
+      "KEGN",
+      "KPLC"
+    ],
+    [
+      "CABL",
+      "KPLC"
+    ],
+    [
+      "CABL",
+      "KEGN"
+    ],
+    [
+      "TOTL",
+      "KQ"
+    ],
+    [
+      "BAMB",
+      "HAFR"
+    ],
+    [
+      "PORT",
+      "HAFR"
+    ],
+    [
+      "CRWN",
+      "HAFR"
+    ],
+    [
+      "BAMB",
+      "CGEN"
+    ]
+  ],
+  "drivers": [
+    {
+      "driver": "CBK rate",
+      "kind": "macro",
+      "helps_when_up": [
+        "KCB",
+        "EQTY",
+        "COOP",
+        "ABSA",
+        "NCBA",
+        "SCBK",
+        "DTK",
+        "IMH",
+        "BKG"
+      ],
+      "hurts_when_up": [
+        "HFCK",
+        "HAFR",
+        "KPLC",
+        "KEGN",
+        "BAMB",
+        "PORT",
+        "CRWN",
+        "CGEN",
+        "TCL",
+        "CTUM"
+      ]
+    },
+    {
+      "driver": "KES/USD",
+      "kind": "macro",
+      "helps_when_up": [
+        "WTK",
+        "KAPC",
+        "LIMT",
+        "SASN",
+        "KUKZ",
+        "EGAD"
+      ],
+      "hurts_when_up": [
+        "KQ",
+        "BAMB",
+        "PORT",
+        "EABL",
+        "UNGA",
+        "BAT",
+        "TOTL",
+        "KPLC",
+        "CGEN"
+      ]
+    },
+    {
+      "driver": "Oil price",
+      "kind": "commodity",
+      "helps_when_up": [
+        "TOTL"
+      ],
+      "hurts_when_up": [
+        "KQ",
+        "BAMB",
+        "PORT",
+        "EABL",
+        "UNGA",
+        "KPLC"
+      ]
+    },
+    {
+      "driver": "Tea price",
+      "kind": "commodity",
+      "helps_when_up": [
+        "WTK",
+        "KAPC",
+        "LIMT",
+        "SASN",
+        "KUKZ",
+        "EGAD"
+      ],
+      "hurts_when_up": []
+    },
+    {
+      "driver": "Construction demand",
+      "kind": "commodity",
+      "helps_when_up": [
+        "BAMB",
+        "PORT",
+        "CRWN",
+        "CABL",
+        "CGEN"
+      ],
+      "hurts_when_up": []
+    }
+  ]
+}

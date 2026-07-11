@@ -5,8 +5,59 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from extractor import build_user_message, _strip_fences
+from extractor import build_user_message, _strip_fences, is_relevant, SYSTEM_PROMPT
 import json
+
+
+class TestRelevancePrefilter:
+    def test_company_name_is_relevant(self):
+        assert is_relevant({"title": "Safaricom reports record profit"})
+        assert is_relevant({"title": "Bamburi Cement announces dividend"})
+
+    def test_ticker_is_relevant(self):
+        assert is_relevant({"title": "KCB shares rally on earnings"})
+
+    def test_macro_keyword_is_relevant(self):
+        assert is_relevant({"title": "CBK raises benchmark interest rate"})
+        assert is_relevant({"description": "The shilling weakened against the dollar"})
+        assert is_relevant({"content": "Global oil price surged past $90"})
+
+    def test_foreign_anchor_is_relevant(self):
+        assert is_relevant({"title": "Boeing 737 MAX grounded after incident"})
+
+    def test_irrelevant_article_is_skipped(self):
+        assert not is_relevant({"title": "Local football derby ends in a draw"})
+        assert not is_relevant({"title": "New smartphone released in the US market"})
+
+    def test_empty_article_is_not_relevant(self):
+        assert not is_relevant({})
+
+    def test_generic_words_alone_do_not_match(self):
+        # "bank"/"group"/"kenya" are stopwords; must not trigger on their own
+        assert not is_relevant({"title": "The group met at a bank in Kenya"})
+
+    def test_ambiguous_place_or_common_words_do_not_match(self):
+        # "Limuru" (town) collides with LIMT; must not trigger on its own
+        assert not is_relevant({"title": "Ol Kalou poll makes 'Limuru Four' inevitable"})
+        assert not is_relevant({"title": "Jubilee party leaders meet in Nairobi"})
+        # but a real distinctive name / ticker still triggers
+        assert is_relevant({"title": "Safaricom half-year results beat forecasts"})
+        assert is_relevant({"title": "KCB dividend announced"})
+
+
+class TestPromptIsLean:
+    def test_prompt_has_no_relationship_list(self):
+        # relationship reasoning moved to the graph; must not bloat the prompt
+        assert "RELATIONSHIP LIST" not in SYSTEM_PROMPT
+
+    def test_prompt_lists_all_tickers(self):
+        from companies import VALID_TICKERS
+        for t in VALID_TICKERS:
+            assert t in SYSTEM_PROMPT
+
+    def test_prompt_is_smaller_than_legacy(self):
+        # legacy prompt was ~6.6k chars; lean target is well under 4k
+        assert len(SYSTEM_PROMPT) < 4000
 
 
 class TestBuildUserMessage:
@@ -43,10 +94,11 @@ class TestBuildUserMessage:
         msg = build_user_message(self._article(content=None, description=None))
         assert json.loads(msg)["article_text"] == "KCB posts profits"
 
-    def test_truncates_long_content_to_2000_chars(self):
+    def test_truncates_long_content_to_configured_cap(self):
+        from config import MAX_ARTICLE_CHARS
         long = "x" * 5000
         msg = build_user_message(self._article(content=long))
-        assert len(json.loads(msg)["article_text"]) == 2000
+        assert len(json.loads(msg)["article_text"]) == MAX_ARTICLE_CHARS
 
     def test_uses_published_at_as_article_date(self):
         msg = build_user_message(self._article(published_at="2024-03-01"))
