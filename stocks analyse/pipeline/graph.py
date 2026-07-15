@@ -71,7 +71,15 @@ MAX_HOPS = 4
 MAGNITUDE_SCALE = 6.0
 
 #: |predicted move %| below this is reported as NEUTRAL.
-DIRECTION_THRESHOLD = 0.5
+#: Raised from 0.5 -> 1.5 on real NSE evidence (2026-07): the engine had NO
+#: demonstrated directional edge and OVER-CALLED badly — it flagged a move on
+#: ~100% of events while only ~20% had a real (>=1.5% abnormal) move. Predicted
+#: magnitudes also cluster tightly (~1.1-1.4%), so only genuinely severe events
+#: now emit a directional call; routine events default to NEUTRAL. The reliable
+#: output is the EXPOSURE map (which tickers are connected), not the direction —
+#: see enrich_prediction's ``exposed`` field. Directional prediction stays
+#: experimental until forward.py accumulates a real backtest.
+DIRECTION_THRESHOLD = 1.5
 
 #: calibrate.py writes fitted coefficients here; they override the defaults
 #: above at import time so tuning does not require editing source.
@@ -728,28 +736,35 @@ def enrich_prediction(
     sources, base_conf = collect_sources(prediction, graph)
     impacts = propagate(graph, sources, event_type, base_confidence=base_conf)
 
-    indirect = []
+    # ``exposed`` is the RELIABLE output: every NSE name the event connects to,
+    # with the graph's (conservative) directional read. ``indirectly_affected``
+    # keeps only the confident directional calls (non-NEUTRAL) for backward
+    # compatibility / the experimental predictor — on current evidence most
+    # events yield NEUTRAL here, which is the honest, non-over-calling behaviour.
+    exposed, indirect = [], []
     for imp in sorted(impacts.values(), key=lambda i: abs(i.shock), reverse=True):
-        if imp.direction == "NEUTRAL":
-            continue
-        indirect.append(
-            {
-                "ticker": imp.node,
-                "impact_type": _impact_type_for(imp),
-                "direction": imp.direction,
-                "confidence": imp.confidence,
-                "magnitude_pct": imp.magnitude_pct,
-                "reasoning": f"Graph propagation via {' -> '.join(imp.path)}",
-                "hops": imp.hops,
-            }
-        )
+        row = {
+            "ticker": imp.node,
+            "impact_type": _impact_type_for(imp),
+            "direction": imp.direction,
+            "confidence": imp.confidence,
+            "magnitude_pct": imp.magnitude_pct,
+            "reasoning": f"Graph propagation via {' -> '.join(imp.path)}",
+            "hops": imp.hops,
+        }
+        exposed.append(row)
+        if imp.direction != "NEUTRAL":
+            indirect.append(row)
 
     out = dict(prediction)
-    out["indirectly_affected"] = indirect
+    out["exposed"] = exposed                 # exposure map (all connected names)
+    out["indirectly_affected"] = indirect    # confident directional calls only
     out["propagation"] = {
         "event_type": event_type,
         "sources": list(sources.keys()),
         "reached": len(impacts),
+        "exposed": len(exposed),
+        "directional_calls": len(indirect),
     }
     return out
 

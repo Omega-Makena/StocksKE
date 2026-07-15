@@ -31,7 +31,9 @@ def test_ethiopian_crash_propagates_to_kenya_airways():
 
     assert "KQ" in impacts, "Kenya Airways should be reached via shared Boeing fleet"
     kq = impacts["KQ"]
-    assert kq.direction == "DOWN"
+    # downward pressure (negative shock); the conservative direction threshold may
+    # report NEUTRAL for a weak multi-hop signal — the sign is the tested property
+    assert kq.shock < 0
     assert kq.magnitude_pct < 0
     # reached through the product node, not a direct competitor hop
     assert any(n.startswith("product:") for n in kq.path)
@@ -56,9 +58,11 @@ def test_earnings_competitor_channel_flips_sign():
     g = G.build_default_graph()
     sources = {"KCB": G.shock_from_prediction("UP", severity=1.0)}
     impacts = G.propagate(g, sources, event_type="earnings")
-    # EQTY is a listed competitor of KCB
+    # EQTY is a listed competitor of KCB; the competitor channel flips the sign
+    # (rival's UP -> negative shock for you), tested independently of the
+    # conservative direction threshold
     assert "EQTY" in impacts
-    assert impacts["EQTY"].direction == "DOWN"
+    assert impacts["EQTY"].shock < 0
 
 
 def test_regulation_moves_whole_sector_same_direction():
@@ -68,7 +72,9 @@ def test_regulation_moves_whole_sector_same_direction():
     # other banks should be dragged DOWN via the sector hub
     banks = [t for t in ("EQTY", "COOP", "ABSA", "NCBA") if t in impacts]
     assert banks, "regulation should spill across the Banking sector"
-    assert all(impacts[t].direction == "DOWN" for t in banks)
+    # same-direction spillover: negative shock like the source (sign, not the
+    # thresholded direction, is the property under test)
+    assert all(impacts[t].shock < 0 for t in banks)
 
 
 def test_magnitude_and_confidence_decay_with_distance():
@@ -201,6 +207,23 @@ def test_driver_channels_inactive_for_non_macro_events():
     sources = {"driver:CBK rate": 1.0}
     assert G.propagate(g, sources, event_type="earnings") == {}
     assert G.propagate(g, sources, event_type="disaster") == {}
+
+
+def test_exposure_map_preserved_when_direction_is_conservative():
+    """A modest-severity event yields few/no confident directional calls (the
+    honest, non-over-calling default) but the EXPOSURE map still lists every
+    connected NSE name — that is the reliable output."""
+    pred = {
+        "event_type": "macro", "severity": 0.4,
+        "source_entities": [{"name": "CBK rate", "kind": "driver", "direction": "UP", "severity": 0.4}],
+        "directly_affected": [],
+    }
+    out = G.enrich_prediction(pred)
+    assert out["exposed"], "exposure map should list the connected NSE names"
+    # confident directional calls are a subset of the exposure map
+    assert len(out["indirectly_affected"]) <= len(out["exposed"])
+    assert out["propagation"]["exposed"] == len(out["exposed"])
+    assert all("reasoning" in e for e in out["exposed"])
 
 
 def test_enrich_from_macro_driver_entity():

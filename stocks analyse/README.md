@@ -1,13 +1,29 @@
 # StocksKE
 
-A system for predicting price movements on the **Nairobi Securities Exchange (NSE)**.
+**An event-exposure and news-analysis engine for the Nairobi Securities
+Exchange (NSE).** Given a news event, it maps *which* NSE-listed names are
+connected to it — directly, and through a knowledge graph of competitors,
+sectors, shared products, and macro/commodity drivers — and flags high-severity
+events for review.
+
+> ### What it does — and what it doesn't (be honest with stakeholders)
+> - ✅ **Reliable:** *exposure mapping* — "this event connects to KQ (shared
+>   Boeing fleet), to TOTL vs KQ/cement (oil price), to the banking sector
+>   (rates)…", plus LLM-extracted event type, severity and sentiment.
+> - 🧪 **Experimental / unproven:** predicting the *direction and magnitude* of
+>   the resulting price move. On a real point-in-time event study (abnormal
+>   returns vs baselines) it currently shows **no demonstrated edge** and, before
+>   hardening, systematically over-called moves. Directional output is therefore
+>   **conservative by default** (only severe events get a call) and stays
+>   experimental until `forward.py` accumulates a statistically meaningful
+>   backtest. Do not present accuracy claims that the harness has not earned.
 
 It is built in three independent layers that feed into each other:
 
 | Layer | Folder | What it does |
 |---|---|---|
 | **Importer** | `importer/` | Downloads daily price lists from Innova, compiles per-security XLSX files, exports a unified prices CSV |
-| **Pipeline** | `pipeline/` | Collects NSE news, runs LLM analysis on each article, validates predictions, aligns them against realised prices, measures accuracy |
+| **Pipeline** | `pipeline/` | Collects NSE news, LLM-extracts the source event, propagates it through the knowledge graph to an **exposure map** (+ conservative directional read), and scores predictions against realised **abnormal** returns |
 | **Production** | `production/` | Dockerised FastAPI + Celery service — ingests prices and news at scale, trains XGBoost models, sends Telegram alerts |
 
 ---
