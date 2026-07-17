@@ -213,6 +213,32 @@ def run(
     )
 
     # ------------------------------------------------------------------
+    # Step 3.6: build event alerts — the product the evidence supports
+    #   (exposure map + validated move-likelihood ranking; direction is
+    #   informational only, not a prediction). Saves a ranked analyst feed.
+    # ------------------------------------------------------------------
+    try:
+        import alert as _alert
+        alerts = [_alert.build_alert(p) for p in valid]
+        alerts = [a for a in alerts if a["exposed_count"]]
+        alerts.sort(key=lambda a: (a["names"][0]["move_likelihood"] if a["names"] else 0), reverse=True)
+        adir = out_dir / "alerts"
+        adir.mkdir(parents=True, exist_ok=True)
+        ts = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        with (adir / f"alerts_{ts}.jsonl").open("w", encoding="utf-8") as fh:
+            for a in alerts:
+                fh.write(json.dumps(a, ensure_ascii=False) + "\n")
+        top = [a for a in alerts if a["top_tier"] in ("HIGH", "MEDIUM")][:10]
+        if top:
+            logger.info("Step 3.6: %d alerts (%d HIGH/MEDIUM). Top of the feed:", len(alerts), len(top))
+            for a in top:
+                print(_alert.render_alert(a, top=5))
+        else:
+            logger.info("Step 3.6: %d alerts built (none reached HIGH/MEDIUM tier)", len(alerts))
+    except Exception:
+        logger.exception("Alert generation failed (pipeline result unaffected)")
+
+    # ------------------------------------------------------------------
     # Step 4: align predictions against realised prices
     # ------------------------------------------------------------------
     logger.info("Step 4: aligning %d predictions against prices CSV: %s", len(valid), prices_csv)

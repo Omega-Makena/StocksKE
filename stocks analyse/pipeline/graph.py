@@ -41,6 +41,7 @@ The module is pure standard library so it can be unit-tested in isolation.
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -366,6 +367,38 @@ def _canonical(name: str) -> str:
     return NON_NSE_ALIASES.get(name, name)
 
 
+# Company NAME -> ticker resolver, used to stop foreign entities whose name
+# happens to equal an NSE ticker symbol (e.g. "TCL" the electronics brand vs
+# TCL = TransCentury) from being seeded as that NSE company.
+_NAME_STOP = {"plc", "ltd", "limited", "co", "company", "the", "group",
+              "holdings", "kenya", "k", "bank", "east", "african", "africa"}
+
+
+def _name_tokens(s: str) -> set[str]:
+    return set(re.sub(r"[^a-z0-9 ]", " ", s.lower()).split()) - _NAME_STOP
+
+
+_COMPANY_NAME_TOKENS = [(_name_tokens(c["name"]), c["ticker"]) for c in NSE_COMPANIES]
+
+
+def _fuzzy_company_ticker(name: str) -> str | None:
+    """Match a free-text company name to an NSE ticker by distinctive-token
+    subset (so 'Safaricom' -> SCOM, 'TransCentury' -> TCL), but NOT by a bare
+    ticker-symbol collision. Single-token registry names require an exact match."""
+    toks = _name_tokens(name)
+    if not toks:
+        return None
+    best, best_n = None, 0
+    for ct, tk in _COMPANY_NAME_TOKENS:
+        if not ct or not (ct <= toks):
+            continue
+        if len(ct) == 1 and ct != toks:
+            continue
+        if len(ct) > best_n:
+            best, best_n = tk, len(ct)
+    return best
+
+
 def resolve_entity_node(name: str, kind: str) -> str:
     """Map an extracted entity (name + kind) to its graph node id. Shared by the
     source-seeding path and the data-derived edge providers so they agree."""
@@ -374,7 +407,18 @@ def resolve_entity_node(name: str, kind: str) -> str:
         return f"product:{name}"
     if kind in ("driver", "macro", "commodity"):
         return f"driver:{name}"
-    return _canonical(name)
+    # company: alias, then NAME match to an NSE ticker.
+    if name in NON_NSE_ALIASES:
+        return NON_NSE_ALIASES[name]
+    tk = _fuzzy_company_ticker(name)
+    if tk:
+        return tk
+    # Not an NSE company by name. If the raw string collides with a ticker symbol
+    # (foreign entity like "TCL" the brand), namespace it so it can't seed that
+    # NSE ticker; otherwise keep it as a genuine foreign anchor node (Boeing…).
+    if name in VALID_TICKERS:
+        return f"ext:{name}"
+    return name
 
 
 # ---------------------------------------------------------------------------

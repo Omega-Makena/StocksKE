@@ -10,20 +10,23 @@ import json
 
 
 class TestRelevancePrefilter:
-    def test_company_name_is_relevant(self):
-        assert is_relevant({"title": "Safaricom reports record profit"})
-        assert is_relevant({"title": "Bamburi Cement announces dividend"})
+    # relevance now needs BOTH an NSE/macro signal AND a Kenyan-context term,
+    # so foreign news whose entities collide with NSE tickers is dropped.
+    def test_kenyan_company_news_is_relevant(self):
+        assert is_relevant({"title": "Safaricom reports record profit"})  # Safaricom = context
+        assert is_relevant({"title": "KCB shares rally", "description": "on the Nairobi bourse"})
+        assert is_relevant({"title": "Bamburi Cement dividend", "description": "Kenya cement maker"})
 
-    def test_ticker_is_relevant(self):
-        assert is_relevant({"title": "KCB shares rally on earnings"})
-
-    def test_macro_keyword_is_relevant(self):
+    def test_kenyan_macro_is_relevant(self):
         assert is_relevant({"title": "CBK raises benchmark interest rate"})
         assert is_relevant({"description": "The shilling weakened against the dollar"})
-        assert is_relevant({"content": "Global oil price surged past $90"})
 
-    def test_foreign_anchor_is_relevant(self):
-        assert is_relevant({"title": "Boeing 737 MAX grounded after incident"})
+    def test_foreign_news_colliding_with_tickers_is_dropped(self):
+        # the whole point: these must NOT be processed
+        assert not is_relevant({"title": "TCL launches new 27-inch QHD display"})   # TCL brand vs TransCentury
+        assert not is_relevant({"title": "HCLTech posts strong quarterly earnings"})
+        assert not is_relevant({"title": "Boeing 737 MAX grounded after US incident"})
+        assert not is_relevant({"content": "Global oil price surged past $90"})     # no Kenyan context
 
     def test_irrelevant_article_is_skipped(self):
         assert not is_relevant({"title": "Local football derby ends in a draw"})
@@ -32,17 +35,12 @@ class TestRelevancePrefilter:
     def test_empty_article_is_not_relevant(self):
         assert not is_relevant({})
 
-    def test_generic_words_alone_do_not_match(self):
-        # "bank"/"group"/"kenya" are stopwords; must not trigger on their own
-        assert not is_relevant({"title": "The group met at a bank in Kenya"})
-
     def test_ambiguous_place_or_common_words_do_not_match(self):
-        # "Limuru" (town) collides with LIMT; must not trigger on its own
-        assert not is_relevant({"title": "Ol Kalou poll makes 'Limuru Four' inevitable"})
+        # even with Kenyan context, place/political collisions must not trigger
+        assert not is_relevant({"title": "Ol Kalou poll makes 'Limuru Four' inevitable in Kenya"})
         assert not is_relevant({"title": "Jubilee party leaders meet in Nairobi"})
-        # but a real distinctive name / ticker still triggers
+        # a distinctive Kenyan name still triggers
         assert is_relevant({"title": "Safaricom half-year results beat forecasts"})
-        assert is_relevant({"title": "KCB dividend announced"})
 
 
 class TestPromptIsLean:

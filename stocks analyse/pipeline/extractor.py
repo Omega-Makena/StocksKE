@@ -109,17 +109,30 @@ def _build_relevance_terms() -> tuple[set[str], set[str]]:
 _REL_WORDS, _REL_PHRASES = _build_relevance_terms()
 _REL_WORD_RE = re.compile(r"\b(" + "|".join(sorted(map(re.escape, _REL_WORDS), key=len, reverse=True)) + r")\b")
 
+# Kenyan-context terms. Required in addition to an NSE/macro signal, because
+# global news collides badly with short NSE tickers (e.g. "TCL" the electronics
+# brand vs TCL = TransCentury; Indian "HCLTech" earnings). Genuine Kenyan
+# business news reliably carries one of these; foreign news does not.
+_KENYA_CONTEXT = {
+    "kenya", "kenyan", "nairobi", "shilling", "cbk", "mombasa", "kisumu",
+    "east africa", "capital markets authority", "epra", "central bank of kenya",
+    "safaricom", "nse-listed", "nairobi securities", "treasury bond", "kra",
+}
+_KENYA_RE = re.compile(r"\b(" + "|".join(sorted(map(re.escape, _KENYA_CONTEXT), key=len, reverse=True)) + r")\b")
+
 
 def is_relevant(article: dict) -> bool:
     """True if the article plausibly concerns an NSE name or macro/commodity
-    driver. Conservative: when in doubt it returns True (a wasted call is
-    cheaper than a missed event)."""
+    driver AND is set in a Kenyan context. The Kenyan-context requirement is what
+    stops foreign news whose entities collide with NSE tickers from being
+    processed (a major noise source)."""
     text = " ".join(str(article.get(k) or "") for k in ("title", "description", "content")).lower()
     if not text.strip():
         return False
-    if _REL_WORD_RE.search(text):
-        return True
-    return any(p in text for p in _REL_PHRASES)
+    signal = bool(_REL_WORD_RE.search(text)) or any(p in text for p in _REL_PHRASES)
+    if not signal:
+        return False
+    return bool(_KENYA_RE.search(text))
 
 
 def build_user_message(article: dict) -> str:
