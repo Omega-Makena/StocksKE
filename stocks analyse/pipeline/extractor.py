@@ -121,17 +121,28 @@ _KENYA_CONTEXT = {
 _KENYA_RE = re.compile(r"\b(" + "|".join(sorted(map(re.escape, _KENYA_CONTEXT), key=len, reverse=True)) + r")\b")
 
 
+# Kenyan news sources are Kenyan by construction — trust their articles on the
+# NSE/macro signal alone. Everything else (NewsAPI's global results, which are
+# ~99% foreign noise for NSE-ticker queries) must additionally prove Kenyan
+# context, which is how we drop foreign entities that collide with NSE tickers.
+_TRUSTED_SOURCES = {"standard", "nation", "capital fm", "kbc", "kenyans",
+                    "business daily", "the star", "citizen", "people daily"}
+
+
 def is_relevant(article: dict) -> bool:
     """True if the article plausibly concerns an NSE name or macro/commodity
-    driver AND is set in a Kenyan context. The Kenyan-context requirement is what
-    stops foreign news whose entities collide with NSE tickers from being
-    processed (a major noise source)."""
+    driver. Kenyan sources are trusted on the signal alone; other sources must
+    also carry a Kenyan-context term (stops foreign news whose entities collide
+    with NSE tickers — a major noise source — from being processed)."""
     text = " ".join(str(article.get(k) or "") for k in ("title", "description", "content")).lower()
     if not text.strip():
         return False
     signal = bool(_REL_WORD_RE.search(text)) or any(p in text for p in _REL_PHRASES)
     if not signal:
         return False
+    src = str(article.get("source") or "").lower()
+    if any(s in src for s in _TRUSTED_SOURCES):
+        return True
     return bool(_KENYA_RE.search(text))
 
 

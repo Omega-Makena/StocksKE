@@ -21,6 +21,15 @@ class TestRelevancePrefilter:
         assert is_relevant({"title": "CBK raises benchmark interest rate"})
         assert is_relevant({"description": "The shilling weakened against the dollar"})
 
+    def test_trusted_kenyan_source_relevant_on_signal_alone(self):
+        # a Kenyan RSS source is trusted without an explicit geographic term
+        assert is_relevant({"title": "KCB posts strong half-year earnings", "source": "Standard"})
+        assert is_relevant({"title": "Equity Group profit up", "source": "Nation"})
+
+    def test_untrusted_source_still_needs_context(self):
+        # same headline from a global source (NewsAPI) without Kenyan context -> dropped
+        assert not is_relevant({"title": "KCB posts strong half-year earnings", "source": "Reuters"})
+
     def test_foreign_news_colliding_with_tickers_is_dropped(self):
         # the whole point: these must NOT be processed
         assert not is_relevant({"title": "TCL launches new 27-inch QHD display"})   # TCL brand vs TransCentury
