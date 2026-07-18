@@ -18,6 +18,32 @@ events for review.
 >   experimental until `forward.py` accumulates a statistically meaningful
 >   backtest. Do not present accuracy claims that the harness has not earned.
 
+### The output: event alerts (`alert.py`)
+
+Each news event becomes a ranked **alert**, not a price call:
+
+```
+[MEDIUM] EARNINGS (severity 0.8) — KCB Group   2026-07-01
+  6 NSE names exposed | move-likelihood ranked (direction = context only, NOT a prediction):
+    KCB    move~48% [MEDIUM] dir(info)=UP      via direct
+    EQTY   move~41% [MEDIUM] dir(info)=NEUTRAL via competitor
+    ...
+```
+
+The **move-likelihood** score (event-type prior × severity × coupling) ranks how
+likely each exposed name is to have an *abnormal move* — validated to sort by
+realised move rate. Direction is shown for context only. Ship *this*; do not ship
+a direction predictor.
+
+### Data source matters — use Kenyan news, not global NewsAPI
+
+A rigorous check found **NewsAPI returns ~99.7% foreign noise for NSE-ticker
+queries** (global "KCB"/"Equity"/"TCL" matches), and foreign entities collide
+with NSE tickers ("TCL" the electronics brand vs TCL = TransCentury). So:
+`collector.is_relevant` **trusts Kenyan RSS feeds** (Standard, Nation, Capital
+FM, KBC, Business Daily…) on the signal alone, and **requires a Kenyan-context
+term for any other source**. Prefer RSS; treat NewsAPI as low-value here.
+
 It is built in three independent layers that feed into each other:
 
 | Layer | Folder | What it does |
@@ -81,6 +107,9 @@ StocksKE/
 │   ├── graph_data.json         # Curated graph structure (products/drivers/suppliers)
 │   ├── graph_sources.py        # Data-derived edges (price co-movement, co-occurrence)
 │   ├── graph_export.json       # Full graph export (consumed by production loader)
+│   ├── alert.py                # Event-alert product: exposure map + move-likelihood score
+│   ├── forward.py              # Daily forward-accumulation runner (grows the backtest)
+│   ├── build_dataset.py        # Pull historical NewsAPI news for a labelled set
 │   ├── aligner.py              # Join predictions with realised prices
 │   ├── calibrate.py            # Fit propagation magnitude to realised moves
 │   ├── pipeline.py             # Orchestrator (runs all steps)
